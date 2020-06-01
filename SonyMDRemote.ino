@@ -21,67 +21,54 @@ void setup() {
   Serial.println("Ready");
 }
 
-unsigned long nextTrigger = 0;
-#define TRIGGER_EVERY 1000 // milliseconds
-uint8_t triggers = 0;
-uint8_t totalTriggers = 0;
+unsigned long lastMessageAt = 0;
+
+unsigned long wentLowAt = 0;
+unsigned long wentHighAt = 0;
+
+#define FRAME_BEGIN_PULSE_MICROS 800
+
+unsigned long lastFrameAtMicros = 0;
 
 void loop() {
-  if (digitalRead(REMOTE_DATA_PIN) == LOW) {
-  // if (pinLow) {
-    // noInterrupts();
-    detachInterrupt(digitalPinToInterrupt(REMOTE_DATA_PIN));
+  if (wentLowAt > 0) {
+    if (digitalRead(REMOTE_DATA_PIN) == HIGH) {
+      wentHighAt = micros();
+      digitalWrite(LED_BUILTIN, LOW);
 
-    pinLow = false;
-    digitalWrite(LED_BUILTIN, HIGH);
-    unsigned long pulseLowMicros = pulseIn(REMOTE_DATA_PIN, HIGH);
-    // unsigned long pulseLowMicros = pulseIn(REMOTE_DATA_PIN, LOW);
-    digitalWrite(LED_BUILTIN, LOW);
+      unsigned int lowForMicros = wentHighAt - wentLowAt;
 
-    // interrupts();
-    attachInterrupt(digitalPinToInterrupt(REMOTE_DATA_PIN), dataPinLow, FALLING);
+      if (lowForMicros > FRAME_BEGIN_PULSE_MICROS) {
+        // digitalWrite(LED_BUILTIN, HIGH);
+        // Serial.println(lowForMicros);
 
-    totalTriggers++;
-    // if (pulseLowMicros >= 150) {
-    //   triggers++;
-    //   // Serial.print(millis());
-    //   // Serial.print(" ");
-    //   Serial.print(pulseLowMicros);
-    //   Serial.print(" ");
-    // }
+        unsigned int startedWaiting = micros();
 
-    // LOOP with pulsein between waiting for high and waiting for low
-    unsigned long pulseHighMicros = pulseIn(REMOTE_DATA_PIN, LOW);
+        while (digitalRead(REMOTE_DATA_PIN) == HIGH) { }
+        unsigned int highForMicros = micros() - startedWaiting;
 
-    // Serial.print(pulseLowMicros);
-    // Serial.print("-");
-    // Serial.print(pulseHighMicros);
-    // Serial.print(" ");
-
-  //   if (pulseHighMicros > 50000) {
-  //     Serial.print(pulseLowMicros);
-  //     Serial.print("-");
-  //     Serial.print(pulseHighMicros);
-  //     Serial.print(" ");
-  //   } else {
-  //     Serial.print(".");
-  //   }
-  // }
-
-    if (pulseHighMicros > 1000) {
-      Serial.println(pulseHighMicros);
-      triggers++;
+        if (highForMicros > FRAME_BEGIN_PULSE_MICROS) {
+          Serial.print(lowForMicros);
+          Serial.print("-");
+          Serial.print(highForMicros);
+          Serial.print("(");
+          Serial.print((micros() - lastFrameAtMicros)/1000);
+          Serial.println(")");
+          lastFrameAtMicros = wentLowAt;
+        }
+      } else {
+        Serial.print(".");
+      }
+      wentLowAt = 0;
     }
-
-    if (millis() >= nextTrigger) {
-      nextTrigger = millis() + TRIGGER_EVERY;
-      Serial.print("T: ");
-      Serial.print(triggers);
-      Serial.print(" ");
-      Serial.println(totalTriggers);
-
-      triggers = 0;
-      totalTriggers = 0;
+  } else {
+    if (digitalRead(REMOTE_DATA_PIN) == LOW) {
+      wentLowAt = micros();
+      wentHighAt = 0;
+      digitalWrite(LED_BUILTIN, HIGH);
     }
   }
+
+
+  // digitalWrite(LED_BUILTIN, LOW);
 }
