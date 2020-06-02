@@ -48,12 +48,13 @@ void loop() {
         unsigned int highForMicros = micros() - startedWaiting;
 
         if (highForMicros > FRAME_BEGIN_PULSE_MICROS) {
+          Serial.println("");
           Serial.print(lowForMicros);
           Serial.print("-");
           Serial.print(highForMicros);
           Serial.print("(");
           Serial.print((micros() - lastFrameAtMicros)/1000);
-          Serial.println(")");
+          Serial.print(")");
           lastFrameAtMicros = wentLowAt;
         }
       } else {
