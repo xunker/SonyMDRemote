@@ -49,14 +49,14 @@ TODO: reject pulses beyond maximum
 
 /* --- polling for high and low state times --- */
 
-
 String frameBuffer = "";
 unsigned long currentLowStartedAt = 0;
 unsigned long currentLowEndedAt = 0;
 unsigned long currentHighStartedAt = 0;
 unsigned long currentHighEndedAt = 0;
 
-void loop() {
+void loop()
+{
   while (digitalRead(REMOTE_DATA_PIN) == LOW) {
     if (currentLowStartedAt == 0)
       currentLowStartedAt = micros();
@@ -67,16 +67,15 @@ void loop() {
   currentLowEndedAt = micros();
 
   unsigned long currentLowLength = currentLowEndedAt - currentLowStartedAt;
-  boolean framestart = false;
-  if ((currentLowLength > FRAME_BEGIN_PULSE_MICROS) && (currentLowLength <= FRAME_BEGIN_PULSE_MICROS * 2)){
+  if (currentLowLength > FRAME_BEGIN_PULSE_MICROS) {
     Serial.println(frameBuffer);
     frameBuffer = "";
-    framestart = true;
+
   }
 
-  // frameBuffer.concat("_");
-  // frameBuffer.concat(currentLowLength);
-  // frameBuffer.concat(" ");
+  frameBuffer.concat("_");
+  frameBuffer.concat(currentLowLength);
+  frameBuffer.concat(" ");
 
   while (digitalRead(REMOTE_DATA_PIN) == HIGH) {
     if (currentHighStartedAt == 0)
@@ -88,24 +87,70 @@ void loop() {
   currentHighEndedAt = micros();
 
   unsigned long currentHighLength = currentHighEndedAt - currentHighStartedAt;
-  // frameBuffer.concat("-");
-  // frameBuffer.concat(currentHighLength);
-  // frameBuffer.concat(" ");
+  frameBuffer.concat("-");
+  frameBuffer.concat(currentHighLength);
+  frameBuffer.concat(" ");
 
-  if ((!framestart) && (currentLowLength <= FRAME_BEGIN_PULSE_MICROS * 2)) {
-    if (currentLowLength <= 20) {
-      frameBuffer.concat(1);
-    } else if (currentLowLength <= 230) {
-      frameBuffer.concat(0);
-    } else {
-      frameBuffer.concat("_");
-      frameBuffer.concat(currentLowLength);
-      frameBuffer.concat("-");
-      frameBuffer.concat(currentHighLength);
-      frameBuffer.concat(" ");
-    }
-  }
 }
+
+/* --- polling for low times only and rejecting data that does fit out pattern --- */
+
+// String frameBuffer = "";
+// unsigned long currentLowStartedAt = 0;
+// unsigned long currentLowEndedAt = 0;
+// unsigned long currentHighStartedAt = 0;
+// unsigned long currentHighEndedAt = 0;
+
+// void loop() {
+//   while (digitalRead(REMOTE_DATA_PIN) == LOW) {
+//     if (currentLowStartedAt == 0)
+//       currentLowStartedAt = micros();
+//     if (currentHighStartedAt > 0)
+//       currentHighStartedAt = 0;
+//   }
+
+//   currentLowEndedAt = micros();
+
+//   unsigned long currentLowLength = currentLowEndedAt - currentLowStartedAt;
+//   boolean framestart = false;
+//   if ((currentLowLength > FRAME_BEGIN_PULSE_MICROS) && (currentLowLength <= FRAME_BEGIN_PULSE_MICROS * 2)){
+//     Serial.println(frameBuffer);
+//     frameBuffer = "";
+//     framestart = true;
+//   }
+
+//   // frameBuffer.concat("_");
+//   // frameBuffer.concat(currentLowLength);
+//   // frameBuffer.concat(" ");
+
+//   while (digitalRead(REMOTE_DATA_PIN) == HIGH) {
+//     if (currentHighStartedAt == 0)
+//       currentHighStartedAt = micros();
+//     if (currentLowStartedAt > 0)
+//       currentLowStartedAt = 0;
+//   }
+
+//   currentHighEndedAt = micros();
+
+//   unsigned long currentHighLength = currentHighEndedAt - currentHighStartedAt;
+//   // frameBuffer.concat("-");
+//   // frameBuffer.concat(currentHighLength);
+//   // frameBuffer.concat(" ");
+
+//   if ((!framestart) && (currentLowLength <= FRAME_BEGIN_PULSE_MICROS * 2)) {
+//     if (currentLowLength <= 20) {
+//       frameBuffer.concat(1);
+//     } else if (currentLowLength <= 230) {
+//       frameBuffer.concat(0);
+//     } else {
+//       frameBuffer.concat("_");
+//       frameBuffer.concat(currentLowLength);
+//       frameBuffer.concat("-");
+//       frameBuffer.concat(currentHighLength);
+//       frameBuffer.concat(" ");
+//     }
+//   }
+// }
 
   /* --- pulsein --- */
 
