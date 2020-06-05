@@ -22,6 +22,24 @@ remote in any way.
 
 Can't wake up the player from "off" state with any remote buttons.
 
+## Button Resistances
+
+Multimeter wiring:
+
+Remote pin 2 (RMT) disconnected from MD player, connected to negative of multimeter.
+Remote pin 4 (VCC) remains connected to MD player, also connected to positive of multimeter.
+
+Remote pins 1 and 3 remain connected to MD player.
+
+Rest    0
+Vol +   9.8k
+Vol -   8.38k
+Play    0.363k
+Prev    1.037k
+Next    3.67k
+Stop    7.09k
+Hold sw 0.5meg to 0.65meg (fluctuates)
+
 ## TODO
 
-* Probe pin resistances
+LCD signal protocol
