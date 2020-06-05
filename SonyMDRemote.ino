@@ -1,4 +1,4 @@
-#define REMOTE_DATA_PIN 53
+#define REMOTE_DATA_PIN A0
 
 volatile boolean pinLow = false;
 void dataPinLow() {
@@ -67,15 +67,8 @@ String frameBuffer = "";
 
 void loop() {
   unsigned long currentLowStartedAt = micros();
-  boolean lowStarted = false;
-  // while (digitalRead(REMOTE_DATA_PIN) == LOW) {
-  while (booleanAvgRead(REMOTE_DATA_PIN, 5) == LOW) {
-    // if (currentLowStartedAt == 0)
-    //   currentLowStartedAt = micros();
-    if (!lowStarted) {
-      currentLowStartedAt = micros();
-      lowStarted = true;
-    }
+  while (digitalRead(REMOTE_DATA_PIN) == LOW) {
+  // while (booleanAvgRead(REMOTE_DATA_PIN, 5) == LOW) {
   }
 
   unsigned long currentLowEndedAt = micros();
@@ -92,15 +85,8 @@ void loop() {
   frameBuffer.concat(" ");
 
   unsigned long currentHighStartedAt = micros();
-  boolean highStarted = false;
-  // while (digitalRead(REMOTE_DATA_PIN) == HIGH) {
-  while (booleanAvgRead(REMOTE_DATA_PIN, 5) == HIGH) {
-    // if (currentHighStartedAt == 0)
-    //   currentHighStartedAt = micros();
-    if (!highStarted) {
-      currentHighStartedAt = micros();
-      highStarted = true;
-    }
+  while (digitalRead(REMOTE_DATA_PIN) == HIGH) {
+  // while (booleanAvgRead(REMOTE_DATA_PIN, 5) == HIGH) {
   }
 
   unsigned long currentHighEndedAt = micros();
