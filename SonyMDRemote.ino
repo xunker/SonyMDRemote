@@ -1,4 +1,4 @@
-#define REMOTE_DATA_PIN A0
+#define REMOTE_DATA_PIN 53
 
 volatile boolean pinLow = false;
 void dataPinLow() {
@@ -35,6 +35,20 @@ unsigned int toNearest(uint8_t nearest, unsigned int num) {
   return ((num + (nearest / 2)) / nearest) * nearest;
 }
 
+boolean booleanAvgRead(uint8_t pin, uint8_t reads) {
+  uint8_t highReads = 0;
+  uint8_t lowReads = 0;
+  for (uint8_t i = 0; i < reads; i++) {
+    if (digitalRead(pin)) {
+      highReads++;
+    } else {
+      lowReads++;
+    }
+    return (highReads >= lowReads);
+  }
+
+}
+
 /*
 NEXT IDEA:
 Just monitor for the low time of every pulse.
@@ -50,21 +64,21 @@ TODO: reject pulses beyond maximum
 /* --- polling for high and low state times --- */
 
 String frameBuffer = "";
-unsigned long currentLowStartedAt = 0;
-unsigned long currentLowEndedAt = 0;
-unsigned long currentHighStartedAt = 0;
-unsigned long currentHighEndedAt = 0;
 
-void loop()
-{
-  while (digitalRead(REMOTE_DATA_PIN) == LOW) {
-    if (currentLowStartedAt == 0)
+void loop() {
+  unsigned long currentLowStartedAt = micros();
+  boolean lowStarted = false;
+  // while (digitalRead(REMOTE_DATA_PIN) == LOW) {
+  while (booleanAvgRead(REMOTE_DATA_PIN, 5) == LOW) {
+    // if (currentLowStartedAt == 0)
+    //   currentLowStartedAt = micros();
+    if (!lowStarted) {
       currentLowStartedAt = micros();
-    if (currentHighStartedAt > 0)
-      currentHighStartedAt = 0;
+      lowStarted = true;
+    }
   }
 
-  currentLowEndedAt = micros();
+  unsigned long currentLowEndedAt = micros();
 
   unsigned long currentLowLength = currentLowEndedAt - currentLowStartedAt;
   if (currentLowLength > FRAME_BEGIN_PULSE_MICROS) {
@@ -77,14 +91,19 @@ void loop()
   frameBuffer.concat(currentLowLength);
   frameBuffer.concat(" ");
 
-  while (digitalRead(REMOTE_DATA_PIN) == HIGH) {
-    if (currentHighStartedAt == 0)
+  unsigned long currentHighStartedAt = micros();
+  boolean highStarted = false;
+  // while (digitalRead(REMOTE_DATA_PIN) == HIGH) {
+  while (booleanAvgRead(REMOTE_DATA_PIN, 5) == HIGH) {
+    // if (currentHighStartedAt == 0)
+    //   currentHighStartedAt = micros();
+    if (!highStarted) {
       currentHighStartedAt = micros();
-    if (currentLowStartedAt > 0)
-      currentLowStartedAt = 0;
+      highStarted = true;
+    }
   }
 
-  currentHighEndedAt = micros();
+  unsigned long currentHighEndedAt = micros();
 
   unsigned long currentHighLength = currentHighEndedAt - currentHighStartedAt;
   frameBuffer.concat("-");
