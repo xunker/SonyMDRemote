@@ -7,6 +7,7 @@
 
 // #include "commands_fulldump.h"
 #include "commands_track_battery.h"
+// #include "commands_volume.h"
 
 void setup() {
   pinModeFast(REMOTE_DATA_PIN, OUTPUT);
@@ -77,7 +78,7 @@ void loop(){
 
   digitalWriteFast(REMOTE_DATA_PIN, HIGH);
   Serial.print(micros()); Serial.println(" Looping");
-  delay(5000);
+  delay(2000);
 }
 
 #endif
