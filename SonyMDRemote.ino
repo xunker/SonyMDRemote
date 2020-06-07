@@ -1,6 +1,50 @@
+
 #include "messages.h"
 
 #define REMOTE_DATA_PIN A0
+// If using DigitalWriteFast:
+// int pinNum = 9; //do not use variables, macro will revert to the slower pinMode()
+// const int pinNum = 9; //this is a constant, will use port manipulation (fast)
+
+// setup commands common to all approaches, to be called within individual setup() routines
+void common_setup()
+{
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+
+  Serial.begin(115200);
+  Serial.println("Ready");
+}
+
+unsigned long wentLowAt = 0;
+unsigned long wentHighAt = 0;
+
+#define FRAME_BEGIN_PULSE_MICROS 800
+
+unsigned int toNearest(uint8_t nearest, unsigned int num) {
+  return ((num + (nearest / 2)) / nearest) * nearest;
+}
+
+boolean booleanAvgRead(uint8_t pin, uint8_t reads) {
+  uint8_t highReads = 0;
+  uint8_t lowReads = 0;
+  for (uint8_t i = 0; i < reads; i++)
+  {
+    if (digitalRead(pin))
+    {
+      highReads++;
+    }
+    else
+    {
+      lowReads++;
+    }
+    return (highReads >= lowReads);
+  }
+}
+
+#include "poll_high_and_low.h"
+
+
 
 // void setup() {
 //   pinMode(REMOTE_DATA_PIN, OUTPUT);
@@ -97,75 +141,7 @@
 //   }
 // }
 
-void setup() {
-  pinMode(REMOTE_DATA_PIN, INPUT);
 
-  pinMode(LED_BUILTIN, OUTPUT);
-  digitalWrite(LED_BUILTIN, LOW);
-
-  Serial.begin(115200);
-  Serial.println("Ready");
-}
-
-unsigned long wentLowAt = 0;
-unsigned long wentHighAt = 0;
-
-#define FRAME_BEGIN_PULSE_MICROS 800
-
-unsigned int toNearest(uint8_t nearest, unsigned int num) {
-  return ((num + (nearest / 2)) / nearest) * nearest;
-}
-
-boolean booleanAvgRead(uint8_t pin, uint8_t reads) {
-  uint8_t highReads = 0;
-  uint8_t lowReads = 0;
-  for (uint8_t i = 0; i < reads; i++) {
-    if (digitalRead(pin)) {
-      highReads++;
-    } else {
-      lowReads++;
-    }
-    return (highReads >= lowReads);
-  }
-
-}
-
-  /* --- polling for high and low state times --- */
-
-  String frameBuffer = "";
-
-  void loop() {
-    unsigned long currentLowStartedAt = micros();
-    while (digitalRead(REMOTE_DATA_PIN) == LOW) {
-    // while (booleanAvgRead(REMOTE_DATA_PIN, 5) == LOW) {
-    }
-
-    unsigned long currentLowEndedAt = micros();
-
-    unsigned long currentLowLength = currentLowEndedAt - currentLowStartedAt;
-    if (currentLowLength > FRAME_BEGIN_PULSE_MICROS) {
-      Serial.println(frameBuffer);
-      frameBuffer = "";
-
-    }
-
-    frameBuffer.concat("-");
-    frameBuffer.concat(toNearest(10, currentLowLength));
-    frameBuffer.concat(", ");
-
-    unsigned long currentHighStartedAt = micros();
-    while (digitalRead(REMOTE_DATA_PIN) == HIGH) {
-    // while (booleanAvgRead(REMOTE_DATA_PIN, 5) == HIGH) {
-    }
-
-    unsigned long currentHighEndedAt = micros();
-
-    unsigned long currentHighLength = currentHighEndedAt - currentHighStartedAt;
-    frameBuffer.concat("+");
-    frameBuffer.concat(toNearest(10, currentHighLength));
-    frameBuffer.concat(", ");
-
-  }
 
   /* --- polling for low times only and rejecting data that does fit out pattern --- */
 
