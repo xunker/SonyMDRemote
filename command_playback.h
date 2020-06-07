@@ -889,29 +889,37 @@ void setup() {
 // https://forum.arduino.cc/index.php?topic=125550.0
 
 void sendCommandBuffer() {
-  for (unsigned int i = 0; i < sizeof(commandBuffer); i++) {
-    if ((i % 100) == 0)
-      Serial.print(".");
-    if ((i % 1000) == 0)
-      Serial.println("");
+  unsigned int commandLength = sizeof(commandBuffer);
+  for (unsigned int i = 0; i < commandLength; i++) {
+    // if ((i % 100) == 0)
+    //   Serial.print(".");
+    // if ((i % 1000) == 0)
+    //   Serial.println("");
+    if ((i % 1000) == 0) {
+      Serial.print(i);
+      Serial.print("/");
+      Serial.println(commandLength);
+    }
 
-    if (commandBuffer[i] < 0) {
-      digitalWriteFast(REMOTE_DATA_PIN, LOW);
-    } else {
+      if (commandBuffer[i] < 0)
+      {
+        digitalWriteFast(REMOTE_DATA_PIN, LOW);
+      } else {
       digitalWriteFast(REMOTE_DATA_PIN, HIGH);
     }
 
     unsigned short signalLength = abs(commandBuffer[i]);
-    if (signalLength < 5) {
-      // https://forum.arduino.cc/index.php?topic=125550.0
-      // "delayMicroseconds() waits at least 4us even if the parameter is less than 4."
-      noInterrupts();
-      for (uint8_t j = 0; j < signalLength; j++) {
-        __asm__("nop\n\tnop\n\tnop\n\tnop\n\tnop\n\t"); // about 1.2us delay on due
-      }
-      interrupts();
+    // if (signalLength < 5) {
+    //   // https://forum.arduino.cc/index.php?topic=125550.0
+    //   // "delayMicroseconds() waits at least 4us even if the parameter is less than 4."
+    //   noInterrupts();
+    //   for (uint8_t j = 0; j < signalLength; j++) {
+    //     __asm__("nop\n\tnop\n\tnop\n\tnop\n\tnop\n\t"); // about 1.2us delay on due
+    //   }
+    //   interrupts();
 
-    } else if (signalLength < 1000) {
+    // } else
+    if (signalLength < 1000) {
       /*
       arduino.cc/reference/en/language/functions/time/delaymicroseconds/
 
