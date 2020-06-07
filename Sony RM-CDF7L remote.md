@@ -1,4 +1,4 @@
-RM-CDF7L Remote when used with MZ-NHF800
+Sony RM-CDF7L Remote when used with MZ-NHF800
 =========================================
 
 ## LCD
