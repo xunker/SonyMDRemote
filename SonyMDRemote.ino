@@ -42,90 +42,9 @@ boolean booleanAvgRead(uint8_t pin, uint8_t reads) {
   }
 }
 
-#include "poll_high_and_low.h"
-
-
-
-// void setup() {
-//   pinMode(REMOTE_DATA_PIN, OUTPUT);
-//   digitalWrite(REMOTE_DATA_PIN, HIGH);
-
-//   pinMode(LED_BUILTIN, OUTPUT);
-//   digitalWrite(LED_BUILTIN, LOW);
-
-//   Serial.begin(115200);
-//   Serial.println("Ready");
-// }
-
-// void sendCommandList(signed int commands[]) {
-
-//   for(uint8_t i = 0; i < sizeof(commands); i++) {
-//     // Serial.println(commands[i]);
-//     if (commands[i] < 0) {
-//       digitalWrite(REMOTE_DATA_PIN, LOW);
-//     } else {
-//       digitalWrite(REMOTE_DATA_PIN, HIGH);
-//     }
-
-//     unsigned short signalLength = abs(commands[i]);
-
-//     /*
-//     arduino.cc/reference/en/language/functions/time/delaymicroseconds/
-
-//     "Currently, the largest value that will produce an accurate delay is 16383.
-//     This could change in future Arduino releases. For delays longer than a few
-//     thousand microseconds, you should use delay() instead"
-//     */
-//     if (signalLength < 1000) {
-//       delayMicroseconds(signalLength);
-//     } else {
-//       delay(signalLength/1000);
-//       // delayMicroseconds(signalLength - ((signalLength / 1000) * 1000));
-//     }
-//   }
-// }
-
-// void loop(){
-//   sendCommandList(command00);
-//   sendCommandList(command01);
-//   sendCommandList(command02);
-//   sendCommandList(command03);
-//   sendCommandList(command04);
-//   sendCommandList(command05);
-//   sendCommandList(command06);
-//   sendCommandList(command07);
-//   sendCommandList(command08);
-//   sendCommandList(command09);
-//   sendCommandList(command10);
-//   sendCommandList(command11);
-//   sendCommandList(command12);
-//   sendCommandList(command13);
-//   sendCommandList(command14);
-//   sendCommandList(command15);
-//   sendCommandList(command16);
-//   sendCommandList(command17);
-//   sendCommandList(command18);
-//   sendCommandList(command19);
-//   sendCommandList(command20);
-//   sendCommandList(command21);
-//   sendCommandList(command22);
-//   sendCommandList(command23);
-//   sendCommandList(command24);
-//   sendCommandList(command25);
-//   sendCommandList(command26);
-//   sendCommandList(command27);
-//   sendCommandList(command28);
-//   sendCommandList(command29);
-//   sendCommandList(command30);
-//   sendCommandList(command31);
-//   sendCommandList(command32);
-//   sendCommandList(command33);
-//   sendCommandList(command34);
-//   sendCommandList(command35);
-//   sendCommandList(command36);
-
-//   digitalWrite(REMOTE_DATA_PIN, HIGH);
-// }
+/* Uncommend ONLY ONE of the following includes */
+// #include "poll_high_and_low.h"
+#include "command_playback.h"
 
 // boolean booleanAvgRead(uint8_t pin, uint8_t reads)
 // {
