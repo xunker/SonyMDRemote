@@ -78,7 +78,7 @@ void loop(){
 
   digitalWriteFast(REMOTE_DATA_PIN, HIGH);
   Serial.print(micros()); Serial.println(" Looping");
-  delay(2000);
+  delay(1000);
 }
 
 #endif

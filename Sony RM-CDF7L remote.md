@@ -8,6 +8,9 @@ plugged in to a NHF800 while playing:
   * Current Track Number
   * Current Battery Level
   * Indication of volume change
+  * Repeat on/off
+  * Repeat 1 track
+  * Shuffle
 
 ## Buttons
 
