@@ -88,15 +88,25 @@ a MiniDisc player or a CD player.
 
 ### LCD / Information Display
 
+(TODO)
+
 #### Compatibility
+
+(TODO: different protocols and voltages)
 
 ## Connector
 
 ### What is the pinout of the connector?
 
+(TODO)
+
 ### What are the dimensions of the connector?
 
+(TODO)
+
 ### How to make a DIY connector
+
+(TODO: include pictures)
 
 ### What is the voltage of the VCC pin?
 
@@ -132,7 +142,11 @@ and ground to be connected before the buttons will work (ex: [RM-CDF7L](./Sony R
 
 ###  Action resistances
 
+(TODO)
+
 ## LCD / Information Display Protocol
+
+(TODO: include pictures)
 
 ## Author and Location
 
