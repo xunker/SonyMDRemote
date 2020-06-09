@@ -59,7 +59,7 @@ for the other.
 
 ## Files in this repository
 
-There is an Arduino program here, [SonyMDRemote.ino], and associated `.h` files
+There is an Arduino program here, [SonyMDRemote.ino](SonyMDRemote.ino), and associated `.h` files
 that I have used both to dump the communication between a MiniDisc player and
 remote control and play-back commands in an effort to reverse-engineer the
 protocol.
@@ -92,7 +92,7 @@ The most basic remote controls will generally have buttons for play, pause,
 fast-forward, rewind and volume.
 
 Some have additional actions that do different things depending on what they are
-connected to. For example, the [Sony Sony RM-MC25C](./Sony Sony RM-MC25C remote.md) remote
+connected to. For example, the [Sony RM-MC25C](Sony+RM-MC25C+remote.md) remote
 has a push+turn action that does different things depending on if connected to
 a MiniDisc player or a CD player.
 
@@ -133,8 +133,8 @@ are off-the-shelf I believe it's safe to assume they are designed for 3.3v
 nominal VCC with the maximum logic level being something common like
 Vcc + 0.2-to-0.5v.
 
-Generally speaking, TTL high is anything greater than Vcc*0.6 and TTL low is
-anything less than Vcc*0.3. This means that a 2.1v "high" signal would be
+Generally speaking, TTL high is anything greater than Vcc * 0.6 and TTL low is
+anything less than Vcc * 0.3. This means that a 2.1v "high" signal would be
 correctly understood by a 3.0v device.
 
 It's possible that older LCD remotes need ~3v Vcc and won't operate on the
@@ -146,9 +146,9 @@ Logically, the buttons work by connecting pin 4 to in 2 through a [resistor ladd
 Different resistances cause different actions on the device.
 
 On some controls the button resistance can be read without VCC or ground being
-connected or a power source (ex: [RM-MC25C](./Sony Sony RM-MC25C remote.md)).
+connected or a power source (ex: [RM-MC25C](./Sony+RM-MC25C+remote.md)).
 Others, usually those with an LCD display, require VCC to be connected to power
-and ground to be connected before the buttons will work (ex: [RM-CDF7L](./Sony RM-CDF7L remote.md)).
+and ground to be connected before the buttons will work (ex: [RM-CDF7L](./Sony+RM-CDF7L+remote.md)).
 
 ###  Action resistances
 
