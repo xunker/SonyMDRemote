@@ -57,6 +57,16 @@ There are also *at least* two different versions of the LCD / Information
 Display protocol, and remote controls designed for one will generally not work
 for the other.
 
+## Files in this repository
+
+There is an Arduino program here, [SonyMDRemote.ino], and associated `.h` files
+that I have used both to dump the communication between a MiniDisc player and
+remote control and play-back commands in an effort to reverse-engineer the
+protocol.
+
+At the moment these should be considered scratch-pads and you probably won't
+be able to run them out of the box without considerable effort.
+
 ## Whis is the name of the connector?
 
 I don't know the technical name for the connector, which is why I've decided
