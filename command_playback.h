@@ -6,8 +6,8 @@
 #include <digitalWriteFast.h>
 
 // #include "commands_fulldump.h"
-// #include "commands_track_battery.h"
-#include "commands_volume.h"
+#include "commands_track_battery.h"
+// #include "commands_volume.h"
 
 void setup() {
   pinModeFast(REMOTE_DATA_PIN, OUTPUT);
