@@ -2,6 +2,7 @@ Sony RM-CDF7L Remote when used with MZ-NHF800
 =========================================
 
 ## LCD
+
 Although there is more space for other items, only three items come alive when
 plugged in to a NHF800 while playing:
 
@@ -42,6 +43,10 @@ Prev    1.037k
 Next    3.67k
 Stop    7.09k
 Hold sw 0.5meg to 0.65meg (fluctuates)
+
+## Voltage
+
+Tested with Vcc of 2.1v and logic level of 2.1-to-2.3v.
 
 ## TODO
 
