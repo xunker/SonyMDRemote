@@ -1,0 +1,860 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<!-- saved from url=(0089)https://web.archive.org/web/20090217092709/http://home.no.net/~htoerrin/md_if/md_spek.htm -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+   <title>Untitled</title>
+   <meta name="GENERATOR" content="Mozilla/3.01Gold (Win95; I) [Netscape]">
+</head>
+<body>
+
+<p>
+  <strong>NOTE:</strong>
+  This is a copy of <a href="https://web.archive.org/web/20090217092709/http://home.no.net/~htoerrin/md_if/md_spek.htm">the original in the Internet Archive</a>.
+  It is duplicated here for convenience and posterity.
+</p>
+<hr>
+
+<p><img src="./Untitled_files/htlib.gif" height="121" width="427" align="BOTTOM"></p>
+
+<h1>Sony MD Headphone interface</h1>
+
+<p>&nbsp;</p>
+
+<h2>Preface</h2>
+
+<p>This is the digital interface on Sony MD players as I have seen it on
+my MZ-R3. It is not complete yet, so I appreciate any input that helps
+me to complete the list. Please let me know if you try to use this interface.</p>
+
+<p>&nbsp;</p>
+
+<h2>Connector</h2>
+
+<p>The connector is described in the figure. Pin 2 and 4 are used to control
+the player by connecting various resistors between the pins. The exact
+values are described elsewhere. This document is about pin 1 and 3, which
+carries digital data to the LCD display sitting on the headphone cable.
+This information includes track number, time and trackname.</p>
+
+<p><img src="./Untitled_files/mdplugg.gif" height="90" width="317" align="BOTTOM"></p>
+
+<p>&nbsp;</p>
+
+<h2>Electrical interface</h2>
+
+<p>The electrical interface is described in the figure. The data packet
+starts with a "reset" pulse. Then a start bit follows (allways
+"0"). Then the 8 bit data and address follows (LSB first). The
+packet is terminated with a stop bit ("0" or "1").
+I have not yet found out why this bit sometimes is a "1", and
+other times is a "0" It may be some kind of parity, but I don't
+know. Each bit is defined as follows:</p>
+
+<ul>
+<li>High for 425us and low for 850us gives a "0".</li>
+
+<li>High for 850us and low for 425us gives a "1".</li>
+</ul>
+
+<p>The logic levels seemes to be quite near 0V for a low signal, and 2.9V
+for a high signal. This means that the levels are TTL compatible, and that
+the codes can be read by a device like the PC printer port, or allmost
+any microcontroller.</p>
+
+<p><img src="./Untitled_files/md_time1.gif" height="243" width="984" align="BOTTOM"></p>
+
+<p>&nbsp;</p>
+
+<h2>Register definition</h2>
+
+<p>Till now, I have found the following registers and functions. I would
+appreciate any feedback if you find something that is wrong, if you understand
+more about how things works, or if you find out something new. I have used
+the following conventions for the data format:</p>
+
+<ul>
+<li>N/A: Data seems to have noe influence on the function.</li>
+
+<li>Ascii character: Ascii text characters used to display track name.</li>
+
+<li>BCD number: Used to display track number and time. If 0x15 is written
+to register 0x49, it means 15 minutes.</li>
+</ul>
+
+<p>&nbsp;</p>
+
+<table border="2" cellspacing="0" cellpadding="2" width="100%">
+<tbody><tr>
+<td width="10%" valign="TOP"><b><tt>Address</tt></b></td>
+
+<td width="4%" valign="TOP">b7-6</td>
+
+<td width="4%" valign="TOP">b5-4</td>
+
+<td width="5%" valign="TOP">b3-0</td>
+
+<td width="25%" valign="TOP"><b><tt>Data</tt></b></td>
+
+<td width="71%" valign="TOP"><b><tt>Description</tt></b></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0x2B</tt></td>
+
+<td width="4%" valign="TOP">00</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">1011</td>
+
+<td width="25%" valign="TOP"><tt>N/A - 0x02</tt></td>
+
+<td width="71%" valign="TOP"><tt>?</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0x40</tt></td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="4%" valign="TOP">00</td>
+
+<td width="5%" valign="TOP">0000</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>This command is used when PLAY button is pressed</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0x41</tt></td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="4%" valign="TOP">00</td>
+
+<td width="5%" valign="TOP">0001</td>
+
+<td width="25%" valign="TOP"><tt>Byte (0-23)</tt></td>
+
+<td width="71%" valign="TOP"><tt>Headphone volume</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0x45</tt></td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="4%" valign="TOP">00</td>
+
+<td width="5%" valign="TOP">0101</td>
+
+<td width="25%" valign="TOP"><tt>Ascii character</tt></td>
+
+<td width="71%" valign="TOP"><tt>Text 2</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0x46</tt></td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="4%" valign="TOP">00</td>
+
+<td width="5%" valign="TOP">0110</td>
+
+<td width="25%" valign="TOP"><tt>0x20</tt></td>
+
+<td width="71%" valign="CENTER"></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0x47</tt></td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="4%" valign="TOP">00</td>
+
+<td width="5%" valign="TOP">0111</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Scroll text one pixel to left</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0x49</tt></td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="4%" valign="TOP">00</td>
+
+<td width="5%" valign="TOP">1001</td>
+
+<td width="25%" valign="TOP"><tt>BCD number</tt></td>
+
+<td width="71%" valign="TOP"><tt>Minutes</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0x4B</tt></td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="4%" valign="TOP">00</td>
+
+<td width="5%" valign="TOP">1011</td>
+
+<td width="25%" valign="TOP"><tt>BCD number</tt></td>
+
+<td width="71%" valign="TOP"><tt>Seconds</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0x4C</tt></td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="4%" valign="TOP">00</td>
+
+<td width="5%" valign="TOP">1100</td>
+
+<td width="25%" valign="TOP"><tt>Ascii character</tt></td>
+
+<td width="71%" valign="TOP"><tt>Text 1: The first character of a line is written
+to this regitser</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0x4D</tt></td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="4%" valign="TOP">00</td>
+
+<td width="5%" valign="TOP">1101</td>
+
+<td width="25%" valign="TOP"><tt>Ascii character</tt></td>
+
+<td width="71%" valign="TOP"><tt>Text 2: The remaining characters of a line
+is written to this register. (Or to 0x45)</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0x68</tt></td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">1000</td>
+
+<td width="25%" valign="TOP"><tt>1</tt>
+<p><tt>2</tt></p>
+
+<p><tt>3</tt></p>
+
+<p><tt>4</tt></p>
+
+<p><tt>5</tt></p>
+</td>
+
+<td width="71%" valign="TOP"><tt>LOW BATT</tt>
+<p><tt>NO DISC</tt></p>
+
+<p><tt>BLANKDISC</tt></p>
+
+<p><tt>DISC&nbsp;ERR</tt></p>
+
+<p><tt>HOLD</tt></p>
+</td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0x69</tt></td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">1001</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Display is turned on (Used to blink during
+pause)</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0x6B</tt></td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">1011</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Display is turned off (Used to blink during
+pause)</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0x7B</tt></td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="5%" valign="TOP">1011</td>
+
+<td width="25%" valign="TOP"><tt>N/A - 67</tt></td>
+
+<td width="71%" valign="TOP"><tt>?</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xA0</tt></td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">0000</td>
+
+<td width="25%" valign="TOP"><tt>BCD number</tt></td>
+
+<td width="71%" valign="TOP"><tt>The track number is continously written here
+when the player is stopped</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xA1</tt></td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">0001</td>
+
+<td width="25%" valign="TOP"><tt>BCD number</tt></td>
+
+<td width="71%" valign="TOP"><tt>The track number is continously written here
+when playing</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xA2</tt></td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">0010</td>
+
+<td width="25%" valign="TOP"><tt>BCD number</tt></td>
+
+<td width="71%" valign="TOP"><tt>The track number is written her once when
+starting to play</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xA3</tt></td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">0011</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Continously written during PAUSE</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xA4</tt></td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">0100</td>
+
+<td width="25%" valign="TOP"></td>
+
+<td width="71%" valign="CENTER"></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xC0</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">00</td>
+
+<td width="5%" valign="TOP">0000</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>No Battery, No Repeat</tt></td>
+</tr>
+
+<tr>
+<td><tt>0xC1</tt></td>
+
+<td><tt>11</tt></td>
+
+<td><tt>00</tt></td>
+
+<td><tt>0001</tt></td>
+
+<td><tt>N/A</tt></td>
+
+<td><tt>Battery Empty, No Repeat</tt></td>
+</tr>
+
+<tr>
+<td><tt>0xC2</tt></td>
+
+<td><tt>11</tt></td>
+
+<td><tt>00</tt></td>
+
+<td><tt>0010</tt></td>
+
+<td><tt>N/A</tt></td>
+
+<td><tt>Battery almost Empty, No Repeat</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xC3</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">00</td>
+
+<td width="5%" valign="TOP">0011</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery 1/4 Full, No Repeat</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xC4</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">00</td>
+
+<td width="5%" valign="TOP">0100</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery 1/2 Full, No Repeat</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xC5</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">00</td>
+
+<td width="5%" valign="TOP">0101</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery 3/4 Full, No Repeat</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xC6</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">00</td>
+
+<td width="5%" valign="TOP">0110</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery Full, No Repeat</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xD0</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="5%" valign="TOP">0000</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>No Battery, Repeat</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xD1</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="5%" valign="TOP">0001</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery Empty, Repeat</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xD2</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="5%" valign="TOP">0010</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery almost Empty, Repeat</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xD3</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="5%" valign="TOP">0011</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery 1/4 Full, Repeat</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xD4</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="5%" valign="TOP">0100</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery 1/2 Full, Repeat</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xD5</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="5%" valign="TOP">0101</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery 3/4 Full, Repeat</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xD6</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">01</td>
+
+<td width="5%" valign="TOP">0110</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery Full, Repeat</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xE0</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">0000</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>No Battery, Repeat1</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xE1</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">0001</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery Empty, Repeat1</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xE2</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">0010</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery almost Empty, Repeat1</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xE3</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">0011</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery 1/4 Full, Repeat1</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xE4</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">0100</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery 1/2 Full, Repeat1</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xE5</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">0101</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery 3/4 Full, Repeat1</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xE6</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">10</td>
+
+<td width="5%" valign="TOP">0110</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery Full, Repeat1</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xF0</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="5%" valign="TOP">0000</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>No Battery, Repeat Shufle</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xF1</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="5%" valign="TOP">0001</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery Empty, Repeat Shufle</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xF2</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="5%" valign="TOP">0010</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery almost Empty, Repeat Shufle</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xF0</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="5%" valign="TOP">0011</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery 1/4 Full, Repeat Shufle</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xF4</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="5%" valign="TOP">0100</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery 1/2 Full, Repeat Shufle</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xF5</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="5%" valign="TOP">0101</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery 3/4 Full, Repeat Shufle</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xF6</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="5%" valign="TOP">0110</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>Battery Full, Repeat Shufle</tt></td>
+</tr>
+
+<tr>
+<td width="10%" valign="TOP"><tt>0xF5</tt></td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="4%" valign="TOP">11</td>
+
+<td width="5%" valign="TOP">0101</td>
+
+<td width="25%" valign="TOP"><tt>N/A</tt></td>
+
+<td width="71%" valign="TOP"><tt>No Battery, Repeat Shufle</tt></td>
+</tr>
+</tbody></table>
+
+<ul>
+<li>No Battery: No battery symbol is displayed</li>
+
+<li>Empty Battery: An empty/hollow battery is displayed</li>
+
+<li>1/2 Battery: An half full battery is displayed</li>
+
+<li>Full Battery: An full battery symbol is displayed<br>
+</li>
+</ul>
+
+<p>I have found this information by connecting the output signal frm the
+MD directly to one input pin on the PC printer port. One idea would be
+to use a microprocessor to decode the information. <a href="https://web.archive.org/web/20090217092709/mailto:M.Richardson@herts.ac.uk">Matthew
+Richardson</a> has done it by using a couple of standard logic components
+to make a shift register. Click here to se the <a href="https://web.archive.org/web/20090217092709/http://home.no.net/~htoerrin/md_if/circuit.gif">schematic</a>.</p>
+
+<ul>
+<h2>Links to other MD related pages:</h2>
+
+<li>Remote controlling of MZ-R3. (Resistor values): <a href="https://web.archive.org/web/20090217092709/http://www.hip.atr.co.jp/~eaw/minidisc/r3_remote.html">http://www.hip.atr.co.jp/~eaw/minidisc/r3_remote.html</a>
+</li>
+
+<li>The Minidisk page: <a href="https://web.archive.org/web/20090217092709/http://www.hip.atr.co.jp/~eaw/minidisc/">http://www.hip.atr.co.jp/~eaw/minidisc</a>
+<br>
+</li>
+
+<h2>Links to other interresting pages:</h2>
+
+<li>My own homepage (Norwegian): <a href="https://web.archive.org/web/20090217092709/http://home.sol.no/htoerrin">http://home.sol.no/htoerrin</a>
+<br>
+</li>
+
+<p>&nbsp;</p>
+
+<p>This list is by no way complete. If you have any additions or comments,
+pleas mail to: <a href="https://web.archive.org/web/20090217092709/mailto:htoerrin@online.no">htoerrin@online.no</a>.
+I will include any additions to this list.</p>
+
+<p>&nbsp;</p>
+
+<p>Visitors:</p>
+
+<p><img src="./Untitled_files/Count.cgi" alt="Counter" height="20" width="90" align="BOTTOM"></p>
+
+<p>&nbsp;</p>
+
+<p>Disclaimer:</p>
+
+<p>I can not take any responsibility for anything that happens to anyone
+or anything. Not even if it has any connection to this information.</p>
+</ul>
+
+
+
+<!--
+     FILE ARCHIVED ON 09:27:09 Feb 17, 2009 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 15:41:20 Jun 10, 2020.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+-->
+</body></html>

@@ -1,0 +1,1 @@
+This is a copy of [the original in the Internet Archive](https://web.archive.org/web/20090217092709/http://home.no.net/~htoerrin/md_if/md_spek.htm). It is duplicated here for convenience and posterity.
