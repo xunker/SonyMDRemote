@@ -146,7 +146,7 @@ high-low pulse.
 
 Matthew Nielsen, June 2020
 
-https://github.com/xunker/SonyMDRemote/protocol/
+https://github.com/xunker/SonyMDRemote/
 
 ## Attributions
 
