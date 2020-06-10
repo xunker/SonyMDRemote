@@ -346,6 +346,8 @@ shown
 
 ---
 
+Two digits, each as Binary Coded Decimal with LSB transmitted FIRST.
+
 ones column binary
 0   0000
 1   1000
@@ -357,9 +359,13 @@ ones column binary
 7   1110
 8   0001
 9   1001
-_   0101
--   1111
-≡   0111
+_   0101 (10)
+    1101 (11)
+    0011 (12)
+    1011 (13)
+≡   0111 (14)
+-   1111 (15)
+
 
 tens column binary
 
@@ -373,7 +379,10 @@ tens column binary
 7   1110
 8   0001
 9   1001
-_   0101
--   1111
-≡   0111
+_   0101 (10)
+    1101 (11)
+    0011 (12)
+    1011 (13)
+≡   0111 (14)
+-   1111 (15)
 
