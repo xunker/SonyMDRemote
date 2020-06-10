@@ -22,7 +22,8 @@ This is NOT an exhaustive list:
 * most Minidisc (MD) players/recorders
 * some Discman and CD-Walkman players
   - includes the CRX10U portable USB CD-R/RW drive
-* some Walkman cassette players
+* some Walkman cassette players, including:
+  - WM-FX493 (LCD unknown)
 * some Network Walkman digital media players
   - NW-A1000, NW-A3000
   - NW-HD1, NW-HD2, NW-HD3, NW-HD5
@@ -156,7 +157,7 @@ and ground to be connected before the buttons will work (ex: [RM-CDF7L](./Sony+R
 
 ## LCD / Information Display Protocol
 
-(TODO: include pictures)
+Please see the [protocol description main page](protocol/README.md).
 
 ## Author and Location
 
