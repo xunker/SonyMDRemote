@@ -133,21 +133,21 @@ const signed int commandBuffer[] = {
     +5,
     -208,
     +208,
-    -209,
-    +6,//+209, //
-    -209,//-3,   //
+    -5,//-209, // final bit of one?
+    +6,   //+209, //
+    -209, //-3,   //
     +6,   //
     -208, //
     +6,   // decimal?
     -208, // decimal?
-    +209,//+4,   // ten
-    -5,//-209, // ten
+    +209, //+4,   // ten
+    -5,   //-209, // ten
     +4,   // twenty
     -207, // twenty
     +5,   // forty
     -208, // forty
-    +208,//+5, // hypen tens
-    -5,//-208, // hyphen tens
+    +5,   // hypen tens
+    -208, // hyphen tens
     +89,
     -208,
     +5,
@@ -229,23 +229,22 @@ const signed int commandBuffer[] = {
     +5,
     -209,
     +123,
-    -207,
-    +6,//+210, //
-    -208,//-2,   //
+    -5,//-207, // final bit of one?
+    +6,   //+210, //
+    -208, //-2,   //
     +6,   //
     -208, //
     +7,   // decimal?
     -208, // decimal?
-    +208,//+5,   // ten
-    -5,//-208, // ten
+    +208, //+5,   // ten
+    -5,   //-208, // ten
     +209, // twenty
     -3,   // twenty
     +6,   // forty
     -208, // forty
-    +5,//+208, // hyphen tens
-    -208,//-3, // hyphen tens
+    +5,   //+208, // hyphen tens
+    -5,//-208, //-3, // hyphen tens
     +11148,
-
 };
 
 /*

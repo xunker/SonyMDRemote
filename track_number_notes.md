@@ -261,6 +261,7 @@ This causes track display to show "1≡" (one-triple-equals):
 -208, // forty
 
 This causes track display to show "-0" (hyphen-zero) - NOTE DIFFERENT TRANSPOSITION ON FINAL BIT!:
+
 +6,//+209, //
 -209,//-3,   //
 +6,   //
@@ -290,6 +291,78 @@ This causes track display to show "-0" (hyphen-zero) - NOTE DIFFERENT TRANSPOSIT
 -6,//-208, // forty
 +5,//+208, // hyphen tens
 -208,//-3, // hyphen tens
+
+This works to show "10". Note that the high pulse of hyphen tens agrees, but low pulse doesn't
+
++5,//+208,
+-209, // final bit of one?
++6,   //+209, //
+-209, //-3,   //
++6,   //
+-208, //
++6,   // decimal?
+-208, // decimal?
++209, //+4,   // ten
+-5,   //-209, // ten
++4,   // twenty
+-207, // twenty
++5,   // forty
+-208, // forty
++5,   // hypen tens
+-208, // hyphen tens
+...
++5,//+123,
+-207, // final bit of one?
++6,   //+210, //
+-208, //-2,   //
++6,   //
+-208, //
++7,   // decimal?
+-208, // decimal?
++208, //+5,   // ten
+-5,   //-208, // ten
++209, // twenty
+-3,   // twenty
++6,   // forty
+-208, // forty
++5,   //+208, // hyphen tens
+-5,//-208, //-3, // hyphen tens
+
+This works to show "11". Note that the high pulse of hyphen tens agrees, but low pulse doesn't:
+
++208,
+-5,//-209, // final bit of one?
++6,   //+209, //
+-209, //-3,   //
++6,   //
+-208, //
++6,   // decimal?
+-208, // decimal?
++209, //+4,   // ten
+-5,   //-209, // ten
++4,   // twenty
+-207, // twenty
++5,   // forty
+-208, // forty
++5,   // hypen tens
+-208, // hyphen tens
+...
++123,
+-5,//-207, // final bit of one?
++6,   //+210, //
+-208, //-2,   //
++6,   //
+-208, //
++7,   // decimal?
+-208, // decimal?
++208, //+5,   // ten
+-5,   //-208, // ten
++209, // twenty
+-3,   // twenty
++6,   // forty
+-208, // forty
++5,   //+208, // hyphen tens
+-5,//-208, //-3, // hyphen tens
 ----
 
 track
