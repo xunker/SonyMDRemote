@@ -23,10 +23,17 @@ Remote pin 4 (VCC) disconnected from MD player, connected to positive of multime
 
 Remote pins 1 and 3 are disconnected from MD player.
 
-Rest        0
-Play        0.329k
-Prev        1.004k
-Next        3.63k
-Stop        7.06k
-Next Folder 11.84K
-Prev Folder 5.14k
+* Rest
+  - 0
+* Play
+  - 0.329k
+* Prev
+  - 1.004k
+* Next
+  - 3.63k
+* Stop
+  - 7.06k
+* Next Folder (push+turn)
+  - 11.84K
+* Prev Folder (push+turn)
+  - 5.14k
