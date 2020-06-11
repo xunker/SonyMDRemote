@@ -3,8 +3,8 @@ Sony RM-CDF7L Remote when used with MZ-NHF800
 
 ## LCD
 
-Although there is more space for other items, only three items come alive when
-plugged in to a NHF800 while playing:
+Although there is more space for other items, not all items on the display come
+alive when plugged in to a NHF800 while playing:
 
   * Current Track Number
   * Current Battery Level
