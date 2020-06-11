@@ -26,7 +26,13 @@ through a series of 1n4148 diodes to drop the voltage first.
 */
 #define REMOTE_DATA_PIN A0
 
-/* which set if commands you want to send to the remote */
+/*
+`commandBuffer[]` is  a list of high/low signals to sent to the remote control.
+
+You can copy/paste output from `remote_dumper.ino` in to this array if you want,
+or can uncomment one of the #include's below that to send canned/capture data */
+
+// const signed int commandBuffer[] = {}
 // #include "commands_fulldump.h"
 #include "commands_track_battery.h"
 // #include "commands_volume.h"
@@ -35,7 +41,7 @@ through a series of 1n4148 diodes to drop the voltage first.
 // FOR ARDUINO DUE, USE: https://github.com/lobbesnl/digitalWriteFast
 #include <digitalWriteFast.h>
 
-void setup() {
+void setup(){
   pinModeFast(REMOTE_DATA_PIN, OUTPUT);
   digitalWriteFast(REMOTE_DATA_PIN, HIGH);
 
