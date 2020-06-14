@@ -1,0 +1,38 @@
+Look at new images:
+
+print_18.png and print_19.png
+
+102us high
+
+print_20.png
+322us high
+
+- We know that part of the 1/0 cycle is a period of 220us (print_05.png)
+- 322us (print_20) subtract 102 (print_18 & 19) is 220 (the same as part of th 1/0 cycle)
+
+Look at print_08
+
+119us high time
+
+- We know that part of the 1/0 cycle is a period of 18us (print_06.png)
+- 119us - 18us is 101us, which is about the same as the 102us period in print_18 and 19
+
+print_15
+
+-----
+
+The first block of signals has 9 transitions.
+Using Toerrin's work, assume the first transition is a zero.
+Therefor zero is low 220us followed by 18us high.
+First block is almost always 9 zeros.
+
+High pulse after first 9 of 119us. Mid-hex-byte separator?
+There are other separators of ~102us. Is this really a 100us separator + 18us high pulse from a bit pair?
+
+(Print_7.png)
+Second block has 8 transitions.
+Second block is 00000001
+
+(Print_11.png)
+578us high, is it really 340us + a bit pair (220us + 18us)?
+Compare to print_20.png which looks like the end of a zero pair before another zero pair
