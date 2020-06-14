@@ -24,7 +24,12 @@ print_15
 The first block of signals has 9 transitions.
 Using Toerrin's work, assume the first transition is a zero.
 Therefor zero is low 220us followed by 18us high.
+... BUT LOOK AT print_19.png: Does that mean that the high part of a zero is don't care, only care that signal was low for 220 and then went high?
 First block is almost always 9 zeros.
+
+One is high 220us and low 18us?
+It return to rest lever required after low pulse? See print_13.png and print_14.png?
+If yes an 18us high after 18us low is to be ignored except as clock?
 
 High pulse after first 9 of 119us. Mid-hex-byte separator?
 There are other separators of ~102us. Is this really a 100us separator + 18us high pulse from a bit pair?
@@ -36,3 +41,65 @@ Second block is 00000001
 (Print_11.png)
 578us high, is it really 340us + a bit pair (220us + 18us)?
 Compare to print_20.png which looks like the end of a zero pair before another zero pair
+
+------
+
+Possible Delimiters:
+
+100us high is a delimiter for connected bytes, e.g. bytes within the same field (like hex address or text string) (print18_png and print_19.png)?
+
+200us high (print_16.png) that is (442us - 20us) - 220us? Is this the record separator?
+
+300us high (print20.png) that is 322us - 20us. Another kind of record separator or delimiter?
+
+IMPORTANT: Think serially and statefully:
+You're lot looking to match the patterns! You're just looking for high periods!
+They cascade in to one another!
+
+Assuming we can ignore the 20us part of bits (print_19.png may show the length of the high period is not important for the bits):
+
+..after initial 1100us low
+* > 20us - bit separator
+  - ..includes and extends in to..
+* > 100us - connected byte separator
+  - ..includes and extends in to..
+* > 200us - field separator A
+  - ..includes and extends in to..
+* > 300us - field separator B
+  - ..includes and extends in to..
+* > 950us - message separator
+
+------
+
+THINK ABOUT THIS:
+
+The "data" part of the signal is all denoted by length of LOW signal periods.
+The "control" part of the signal is all denotes by the length of HIGH signal periods.
+
+If above is true you then ONLY NEED TO LOOK AT THE LOW PERIOD LENGTHS TO EXTRACT THE BITS.
+
+
+------
+
+MESSAGE DIA:
+
+low   1100us
+high  960us
+
+9 bits:
+  0   low   220us
+      high  20us
+  1   high  220
+      low   20us
+100us separator
+8 bits
+350us separator
+8 bits
+200us separator
+8 bits
+100us separator
+8 bits
+100us separator
+8 bits
+300us separator
+
