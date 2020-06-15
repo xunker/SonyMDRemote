@@ -37,7 +37,7 @@ This is the pin that will receiev the data from the player. If your device
 uses "active-low" to send data I recommend you connect a 100k-470k resistor
 between this pin and ground.
 */
-#define REMOTE_DATA_PIN A0
+#define REMOTE_DATA_PIN A1
 
 // https://github.com/NicksonYap/digitalWriteFast
 // FOR ARDUINO DUE, USE: https://github.com/lobbesnl/digitalWriteFast
