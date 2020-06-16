@@ -14,6 +14,10 @@ that will return to the start of the current track).
 
 The play button can wake the player from a sleep/off state.
 
+## Wiring
+
+Resistance between pins 1 and 3 (with power disconnected) is zero ohms.
+
 ## Button Resistances
 
 Multimeter wiring:

@@ -26,6 +26,11 @@ remote in any way.
 
 Can't wake up the player from "off" state with any remote buttons.
 
+## Wiring
+
+Resistance between pins 1 and 3 (with power disconnected) starts at about 1.6meg
+and then settles down to 1.83meg.
+
 ## Button Resistances
 
 Multimeter wiring:
