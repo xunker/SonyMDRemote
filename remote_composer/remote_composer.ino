@@ -138,27 +138,30 @@ void sendVolumeMessage(uint8_t volume) {
   send105BitMessageBody(bodyBytes);
 }
 
-void sendTrackNumberMessage(uint8_t trackNumber) {
+void sendTrackNumberMessage(uint8_t track) {
+  Serial.print(track);
+  Serial.print(" ");
+
   uint8_t hundreds = 0;
-  if (trackNumber > 100) {
-    hundreds = trackNumber / 100;
-    trackNumber = trackNumber = (hundreds * 100);
+  if (track >= 100) {
+    hundreds = track / 100;
+    track = track - (hundreds * 100);
   }
 
   uint8_t tens = 0;
-  if (trackNumber > 10) {
-    tens = (trackNumber / 10);
-    trackNumber = trackNumber = (tens * 10);
+  if (track >= 10) {
+    tens = (track / 10);
+    track = track - (tens * 10);
   }
 
-  uint8_t ones = trackNumber;
+  uint8_t ones = track;
 
   byte bodyBytes[10] = {
       0b00000101, // Track number message  0xA0
       0b00000000,
       0b00000000,
-      flipByte(hundreds), // hundreds
-      flipByte(ones),     // ones/tens TODO FIX BCD PACKING
+      flipByte(hundreds),           // hundreds
+      flipByte((tens << 4) ^ ones), // tens/ones
       0b00000000,
       0b00000000,
       0b00000000,
@@ -210,7 +213,7 @@ void volumeLoop() {
     volDir = +1;
 }
 
-byte trackNumber = 0;
+uint8_t trackNumber = 90;
 signed short trackNumberDir = 1;
 
 void trackNumberLoop() {
@@ -220,7 +223,7 @@ void trackNumberLoop() {
   sendTrackNumberMessage(trackNumber);
 
   trackNumber += trackNumberDir;
-  if (trackNumber >= 9)
+  if (trackNumber >= 99)
     trackNumberDir = -1;
   if (trackNumber <= 0)
     trackNumberDir = +1;
@@ -250,5 +253,5 @@ void loop() {
   digitalWriteFast(REMOTE_DATA_PIN, HIGH);
   Serial.print(micros());
   Serial.println(" Looping");
-  delay(500);
+  delay(1000);
 }
