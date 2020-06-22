@@ -1,30 +1,60 @@
-Sony RM-CDF7L Remote when used with MZ-NHF800
-=========================================
+Sony RM-CDF7L Remote
+====================
+
+Originally for an AM/FM-enabled CD-Walkman. It is surprisingly compatible with
+other players.
+
+It relies on an AM/FM tuner in the player and cannot received radio by itself.
+
+It looks physically identical to the [RM-MZ1T](Sony+RM-MZ1T+remote.md) except
+for the "CD Walkman" branding. There may be protocol-level differences
+between the two models.
+
+## Compatibility
+
+Testing working (display+buttons) with
+
+* MZ-NRF800 MD Walkman recorder
+* D-EJ815 CD Walkman player
+* MZ-E505 MD Walkman player
+
+This means the remote is data-compatible with at least two different versions
+of the display protocol (the versions used in the MZ-NRF800 and MZ-E505 are
+different).
 
 ## LCD
 
-Although there is more space for other items, only some items on the display
-come alive when plugged in to a NHF800 while playing:
+Standard CD player type display with track numbers (00-99), time index (doubles
+as radio frequency display, volume display, and group/step number display), and
+mode indicators (repeat, AVLS, etc).
 
-  * Current Track Number
-  * Current Battery Level
-  * Indication of volume change
-  * Repeat on/off
-  * Repeat 1 track
-  * Shuffle
+Track number May be able to use the time index field to display track title
+text, but does not work in MZ-NRF800 or MZ-E505 test players.
 
 ## Buttons
 
-All buttons function as expected, with the exception of "Radio On" button, which
-is expected.
+All buttons function as expected with the exception of "Radio On" button (which
+is expected).
+
+Because the internal resistor ladder is switched using MOSFETs, power must be
+applied to the VCC pin for the buttons to work. Consquently, you can't use the
+buttons to wake up the player from "off" state with any remote buttons.
 
 ## Operation
+
+### Connected to MZ-NHF800
 
 Although the remote data line comes alive when you press "Stop" on the player
 from an "off" state, that data stream does not seem to effect the display on the
 remote in any way.
 
-Can't wake up the player from "off" state with any remote buttons.
+### Connected to D-EJ815
+
+Working. More detail TBA.
+
+### Connected to MZ-E505
+
+Working. More detail TBA.
 
 ## Wiring
 
@@ -56,6 +86,8 @@ Remote pins 1 and 3 remain connected to MD player.
   - 7.09k
 * Hold switch on
   - 0.5meg to 0.65meg (fluctuates)
+
+TODO: check if `Radio On` sends a resistance signal, too.
 
 ## Voltage
 

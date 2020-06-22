@@ -20,8 +20,11 @@ The port is ubiquitous on Sony's MiniDisc players and recorders, hence the name,
 but it also appears on many other Sony devices. This is NOT an exhaustive list:
 
 * most Minidisc (MD) players/recorders
-* some Discman and CD-Walkman players
-  - includes the CRX10U portable USB CD-R/RW drive
+* some Discman and CD-Walkman players, including:
+  - D-66 (1990)
+  - D-350 (1991)
+  - D-EJ815 (2000)
+  - CRX10U portable USB CD-R/RW drive
 * some Walkman cassette players, including:
   - MW-EX1, MW-EX2, MW-EX3, MW-EX5, MW-EX7, MW-EX20
   - MW-EX511, MW-EX563, MW-EX570
@@ -31,10 +34,10 @@ but it also appears on many other Sony devices. This is NOT an exhaustive list:
   - MW-GX622, MW-GX711, MW-GX822
   - MW-RX822
   - MW-WX777
-* some Network Walkman digital media players
+* some Network Walkman digital media players, including:
   - NW-A1000, NW-A1200, NW-A3000
   - NW-HD1, NW-HD2, NW-HD3, NW-HD5
-* some portable Dat recorders
+* two portable Dat recorders
   - TCD-D100
   - PCM-M1
 * some hard-drive-based media players
