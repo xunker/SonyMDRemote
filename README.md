@@ -109,7 +109,7 @@ The most basic remote controls will generally have buttons for play, pause,
 fast-forward, rewind and volume.
 
 Some have additional actions that do different things depending on what they are
-connected to. For example, the [Sony RM-MC25C](Sony+RM-MC25C+remote.md) remote
+connected to. For example, the [Sony RM-MC25C](devices/remotes/Sony+RM-MC25C+remote.md) remote
 has a push+turn action that does different things depending on if connected to
 a MiniDisc player or a CD player.
 
@@ -164,14 +164,14 @@ Logically, the buttons work by connecting pin 4 to 2 through a
 Different resistances cause different actions on the device.
 
 On some controls the button resistance can be read without VCC or ground being
-connected or a power source (ex: [RM-MC25C](./Sony+RM-MC25C+remote.md)).
+connected or a power source (ex: [RM-MC25C](devices/remotes/Sony+RM-MC25C+remote.md)).
 Others, usually those with an LCD display, require VCC to be connected to power
 and ground to be connected before the buttons will work (ex:
-[RM-CDF7L](./Sony+RM-CDF7L+remote.md)).
+[RM-CDF7L](devices/remotes/Sony+RM-CDF7L+remote.md)).
 
 ###  Action resistances
 
-Look in the [devices](devices/) directory for a list of the currently tested
+Look in the [remotes](devices/remotes/) directory for a list of the currently tested
 device remote control devices and the resitances of their buttons.
 
 ## LCD / Information Display Protocol
