@@ -20,6 +20,9 @@ The port is ubiquitous on Sony's MiniDisc players and recorders, hence the name,
 but it also appears on many other Sony devices. This is NOT an exhaustive list:
 
 * most Minidisc (MD) players/recorders
+  * Sony MZP-1 MD Label Printer
+  * Players *without* connector:
+    * MZ-E300, MZ-E310
 * some Discman and CD-Walkman players, including:
   - D-11, D-66, D-99 (1990)
   - D-350 (1991)
