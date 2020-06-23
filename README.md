@@ -21,7 +21,7 @@ but it also appears on many other Sony devices. This is NOT an exhaustive list:
 
 * most Minidisc (MD) players/recorders
 * some Discman and CD-Walkman players, including:
-  - D-66 (1990)
+  - D-11, D-66, D-99 (1990)
   - D-350 (1991)
   - D-EJ815 (2000)
   - CRX10U portable USB CD-R/RW drive
