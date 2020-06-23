@@ -53,6 +53,10 @@ A digital signal to show information on the LCD display on the remote (if it has
 
 Usually regulated power from 2.1v to 2.9v DC, but some players use a direct connection to battery/power instead.
 
+## How to make a DIY connector
+
+(TODO: include pictures)
+
 ## Model
 
 An [OpenScad model](connector.scad) is included in this repo.

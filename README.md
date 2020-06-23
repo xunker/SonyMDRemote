@@ -76,22 +76,24 @@ for the other.
 
 ## File and Directories in this repository
 
-* [remote_dumper](remote_dumper/)
-  - Arduino sketch for dumping LCD display data from a player device.
-* [remote_sender](remote_sender/)
-  - Arduino sketch for sending data to the LCD of a connected remote control device.
-* [remote_composer](remote_composer/)
-  - Arduino sketch for building remote control LCD messages by hand to sent to the remote control device.
+* [connector](connector/)
+  - Physical and electrical description of the connector
 * [protocol](protocol/)
   - Details on the electrical and logical signaling for sending data to the LCD
 * [devices](devices/)
-  - Information on individual devices, such as players or remotes.
+  - Information on individual devices, such as players or remotes
+
+* [remote_dumper](remote_dumper/)
+  - Arduino sketch for dumping LCD display data from a player device
+* [remote_sender](remote_sender/)
+  - Arduino sketch for sending data to the LCD of a connected remote control device
+* [remote_composer](remote_composer/)
+  - Arduino sketch for building remote control LCD messages by hand to sent to the remote control device
 
 ## Whis is the name of the connector?
 
 I don't know the technical name for the connector, which is why I've decided
-to call it the "Sony MD Remote" connector for now, even though it is used on
-other devices.
+to call this repo "Sony MD Remote", even though it is used on other devices.
 
 The technical description would be something like "TRS + 4-pin edge". There is
 undoubtably a Sony-internal part name and manufacturer part number, but I don't
@@ -118,25 +120,11 @@ a MiniDisc player or a CD player.
 
 ### LCD / Information Display
 
-(TODO)
+For remote controls that have a display when connected to a compatible player, the player can use it to show things like track titles, times, volume, etc.
 
-#### Compatibility
+## Connector pinout and dimensions
 
-(TODO: different protocols and voltages)
-
-## Connector
-
-### What is the pinout of the connector?
-
-(TODO)
-
-### What are the dimensions of the connector?
-
-(TODO)
-
-### How to make a DIY connector
-
-(TODO: include pictures)
+Information on the physical connector and the pinout can be found in the [connector directory](connector/).
 
 ### What is the voltage of the VCC pin?
 
