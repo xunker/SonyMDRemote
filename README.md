@@ -23,11 +23,15 @@ but it also appears on many other Sony devices. This is NOT an exhaustive list:
   * Sony MZP-1 MD Label Printer
   * Players *without* connector:
     * MZ-E300, MZ-E310
+  * Few Aiwa players:
+    - AM-NX1, AM-F90, AM-PX3, AM-PX1
 * some Discman and CD-Walkman players, including:
   - D-11, D-66, D-99 (1990)
   - D-350 (1991)
   - D-EJ815 (2000)
   - CRX10U portable USB CD-R/RW drive
+  - few Aiwa players:
+    - XP-V713, XP-ZV71, XP-ZV77
 * some Walkman cassette players, including:
   - MW-EX1, MW-EX2, MW-EX3, MW-EX5, MW-EX7, MW-EX20
   - MW-EX511, MW-EX563, MW-EX570
