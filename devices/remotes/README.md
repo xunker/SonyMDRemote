@@ -6,17 +6,17 @@ Remote Controls
 - RM-CD6
 - RM-CD12EL
 - RM-CD16EL
-- [RM-CDC2](./Sony%20RM-CDC2%20remote.md)
-- [RM-CDF7L](./Sony%20RM-CDF7L%20remote.md)
-- [RM-DM4L](./Sony%20RM-DM4L%20remote.md)
-- [RM-ED100](./Sony%20RM-ED100%20remote.md)
+- [RM-CDC2](./Sony%20RM-CDC2.md)
+- [RM-CDF7L](./Sony%20RM-CDF7L.md)
+- [RM-DM4L](./Sony%20RM-DM4L.md)
+- [RM-ED100](./Sony%20RM-ED100.md)
 - RM-MC10L
   * Shipped with European [MZ-707](https://minidisc.org/part_Sony_MZ-N707.html)
 - RM-MC11EL
 - [RM-MC11ELS](https://www.minidisc.org/part_Sony_RM-MC11ELS.html)
   * Shipped with [MZ-R900](https://minidisc.org/part_Sony_MZ-R900.html), [MZ-R909](https://minidisc.org/part_Sony_MZ-R909.html), North American [MZ-N1](https://minidisc.org/part_Sony_MZ-N1.html)
 - [RM-MC12ELK](https://www.minidisc.org/part_Sony_RM-MC12ELK.html)
-- [RM-MC25C](./Sony%20RM-MC25C%20remote.md)
+- [RM-MC25C](./Sony%20RM-MC25C.md)
 - RM-MC21
 - RM-MC26
 - RM-MC27
@@ -36,7 +36,7 @@ Remote Controls
 - RM-MC55ELK
 - RM-MC60
 - RM-MC61
-- [RM-MZ1T](./Sony%20RM-MZ1T%20remote.md)
+- [RM-MZ1T](./Sony%20RM-MZ1T.md)
 - RM-MZ2N
   * Shipped with [MZ-E60](https://minidisc.org/part_Sony_MZ-E60.html)
 - RM-MZ2S
@@ -50,12 +50,12 @@ Remote Controls
   * Shipped with [MZ-R30](https://minidisc.org/part_Sony_MZ-R30.html)
 - RM-MZE1
   * Can be used with MZ-R30, R37, R50, R55, R90, R91, R4ST, R5ST, E25, E30, E33, E35, E44, E45, E50, E55, E70, E80, EP10, EP11, EPS11 (according to [minidisc.org](https://minidisc.org/part_Recorders_Sony.html))
-- [RM-MZE33](./Sony%20RM-MZE33%20remote.md)
+- [RM-MZE33](./Sony%20RM-MZE33.md)
 - RM-MZE55
   * Shipped with [MZ-E55](https://minidisc.org/part_Sony_MZ-E55.html)
-- [RM-VSC2](./Sony%20RM-VSC2%20remote.md)
+- [RM-VSC2](./Sony%20RM-VSC2.md)
 - [RM-WMC1](https://www.minidisc.org/part_Sony_RM-WMC1.html)
-- [RM-WMF5](./Sony%20RM-WMF5%20remote.md)
+- [RM-WMF5](./Sony%20RM-WMF5.md)
 
 ## Aiwa
 
