@@ -1,20 +1,26 @@
 Sony RM-MZE33 Remote
 ====================
 
+![picture of Sony RM-MZE33 remote](images/sony_rm-mze33.jpg)
+
 Remote originally included with MZ-E33 MiniDisc player.
 
 ## Compatibility
 
-Certaily works with MZ-E33. Tested working with MZ-E505.
+Certaily works with MZ-E33. Tested working with MZ-E501.
 
-Tested and found *not working* with:
+Buttons tested and working with:
+* MZ-NHF800
+* D-EJ815
+
+Tested and found display *not working* with:
 * MZ-NHF800
 * D-EJ815
 * WM-FX855
 
 ## LCD
 
-Full dot-matrix LCD.
+Full dot-matrix LCD text area.
 
 ## Buttons
 

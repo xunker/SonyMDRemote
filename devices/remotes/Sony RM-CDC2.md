@@ -1,5 +1,7 @@
-Sony RM-CDC Remote
+Sony RM-CDC2 Remote
 =========================================
+
+![picture of Sony RM-CDC2 remote](images/sony_rm-cdc2.jpg)
 
 This remote has no display, and does not require external power from pin 4 to
 operate.
@@ -18,6 +20,8 @@ on shuffle.
 
 Pins 1 and 3 are disconnected internally. The wire has enough strands but they
 are simply not connected.
+
+![picture of Sony RM-CDC2 remote](images/sony_rm-cdc2_wiring.jpg)
 
 ## Button Resistances
 

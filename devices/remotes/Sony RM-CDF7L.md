@@ -1,12 +1,14 @@
 Sony RM-CDF7L Remote
 ====================
 
+![picture of Sony RM-CDF7L remote](images/sony_rm-cdf7l.jpg)
+
 Originally for an AM/FM-enabled CD-Walkman. It is surprisingly compatible with
 other players.
 
-It relies on an AM/FM tuner in the player and cannot received radio by itself.
+It must be connected to a player that support the radio function in order for radio to work.
 
-It looks physically identical to the [RM-MZ1T](Sony+RM-MZ1T+remote.md) except
+It looks physically identical to the [RM-MZ1T](Sony+RM-MZ1T.md) except
 for the "CD Walkman" branding. There may be protocol-level differences
 between the two models.
 

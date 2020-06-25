@@ -1,6 +1,8 @@
 Sony RM-WMF5 Remote
 ===================
 
+![picture of Sony RM-WMF5 remote](images/sony_rm-wmf5.jpg)
+
 Originally shipped with Walkman WM-FX494 and MW-FX496ST.
 
 ## Buttons

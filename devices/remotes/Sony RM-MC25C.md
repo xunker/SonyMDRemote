@@ -1,14 +1,15 @@
-Sony RM-MC25C Remote when used with MZ-NHF800
+Sony RM-MC25C Remote
 =========================================
+
+![picture of Sony RM-MC25C remote](images/sony_rm-mc25c.jpg)
 
 This remote has no display, and does not require external power from pin 4 to
 operate.
 
 ## Buttons
 
-All buttons function as expected, except next/prev folder ("push + turn") which
-immediately moves to the previous/next track (unlike the reglar previous button
-that will return to the start of the current track).
+Connected to MZ-NHF800, all buttons function as expected except next/prev folder ("push + turn") which
+seems to move 10 tracks ahead or behind. It would probably change groups if playing in group mode.
 
 ## Operation
 
