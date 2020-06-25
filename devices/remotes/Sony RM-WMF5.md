@@ -24,6 +24,10 @@ Unlike the majority of remotes that connect pin 4 to pin 2 through a resistor to
 
 This means the remote port on compatible Walkman players uses pin 2 with *pull-up* rather than *pull-down* like most other players
 
+## Wiring
+
+Remote gives 0.227meg resistance between pins 1 and 3 while connected to player
+
 ## Button Resistances
 
 Meter connected between pin 1 and pin 2 (instead of more common 2 and 4).
