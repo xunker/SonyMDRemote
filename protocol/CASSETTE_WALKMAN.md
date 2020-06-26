@@ -19,9 +19,9 @@ Signals of this level may be problematic to detect on a 3.3v microcontroller. Fo
 
 Start of message is signaled by high for 5ms, followed by low for 2ms.
 
-`Zero` is indicated by 2ms low followed by 400us of high.
+`Zero` is indicated by 550-600us high followed by 2ms of low.
 
-`One` is indicated by 2ms high followed by 400us of low.
+`One` is indicated by 2ms high followed by 550-600us of low.
 
 Messages are only sent when a button is pushed, or if the player does an automatic action (like triggering of auto-reverse at the end of the side of a tape).
 
@@ -32,7 +32,7 @@ Data is send most-significant-bit-first (big-endian).
 
 Messages are either 8- or 24-bits long. There are no start or stop bits sent.
 
-If the message is 24-bits long, there is a 2.5ms low between the first 8 bits and and remaining 16 bits. There is no pause between the second two bytes.
+If the message is 24-bits long, there is a 2ms low between the first 8 bits and and remaining 16 bits. There is no pause between the second two bytes.
 
 8-bit message:
 
@@ -44,7 +44,52 @@ If the message is 24-bits long, there is a 2.5ms low between the first 8 bits an
 
 ### First Byte
 
-The first byte is divided in to two 4-bit nibbles.
+Examples:
+* 00000010 (Stop button pressed in radio mode, radio turning off)
+* 00110000 (Band / Radio on button pressed from off state)
+* 00000100 (Play button pressed from off state, forward direction)
+* 00111000 (Play button pressed from off state, reverse direction)
+* 00000010 (Stop button pressed in tape mode, tape stopping)
+* 00001100 (Play button pressed in playing state, changing plan direction from forward to reverse)
+* 00000100 (Play button pressed in playing state, changing plan direction from reverse to forward)
+* 00100000 (Rewind button pressed from playing state, forward direction)
+* 00010000 (Fast-forward button pressed from playing state, forward direction)
+* 00101000 (Rewind button pressed from playing state, reverse direction)
+* 00011000 (Fast-forward button pressed from playing state, reverse direction)
+* 01010101 (ASP button long-pressed from radio mode)
+
+Radio Mode:
+
+Position | Meaning
+---------|---------------------------------
+0        | 0 indicates radio mode
+1        |
+2        | Tape direction, 0 = rev, 1 = fwd
+3        |
+4..7     | Current preset number as BCD
+
+Tape Mode (normal):
+
+Position | Meaning
+---------|----------------------------------
+0        | 1 indicates tape mode
+1        | Rewind
+2        | Fast-forward
+3        | Tape direction, 0 = rev, 1 = fwd
+4        | Play
+5        | Stop
+6        | ?
+7        | ?
+
+Tape Mode (FFwd or Rwd):
+
+Position | Meaning
+---------|----------------------------------
+0        | 1 indicates tape mode
+1        | Rewind
+2        | Fast-forward
+3        | Tape direction, 0 = rev, 1 = fwd
+4..7     | BCD of current "AMS" selection
 
 #### First Nibble
 
@@ -56,15 +101,28 @@ It appears that the upper nibble is further divided in to two pairs.
 
 (Unsure) The second pair of the upper nibble may be the play direction:
 * `00`: Forward
-* `11`: Reverse
+* `01`: Reverse
 
 The second pair is always `00` when in radio mode.
 
 #### Second Nibble
 
 (Unsure) In tape mode, this could indicate the current action (playing, ffwd, rwd, etc). Examples:
-* `00000100` (tape mode, playing forward)
-* `00001100` (tape mode, playing reverse)
+* `00001000` (tape mode, playing forward)
+* `00011000` (tape mode, playing reverse)
+
+00010100
+
+
+00100000 # from playing fwd state, press ffwd button
+01000000 # from playing fwd state, press rwd button
+00110000 # from playing reverse state, press ffwd button
+01010000 # from playing reverse state, press rwd button
+
+11100010 1001011110010010 # radio in reverse state
+11000010 ................ # radio in fwd state
+
+
 
 In radio mode, this is the current preset number in BCD form.
 
