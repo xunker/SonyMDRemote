@@ -53,38 +53,36 @@ void setup() {
   Serial.println("Ready");
 }
 
-unsigned long wentLowAt = 0;
-unsigned long wentHighAt = 0;
-
-/* the length of the low signal that marks the beginning of a new message */
-#define FRAME_BEGIN_PULSE_MICROS 800
+/* any signal, high or low, that is longer than this will be treated as the end of one message and the beginning of another */
+#define END_OF_MESSAGE_TIMEOUT_MICROSECONDS 10000
 
 String frameBuffer = "";
 
-void loop()
-{
-  unsigned long currentLowStartedAt = micros();
-  while (digitalReadFast(REMOTE_DATA_PIN) == LOW) {}
+void waitForLevelAndRecord(boolean level) {
+  unsigned long currentlevelStartedAt = micros();
+  while (digitalReadFast(REMOTE_DATA_PIN) == level) {}
 
-  unsigned long currentLowEndedAt = micros();
+  unsigned long currentLevelEndedAt = micros();
 
-  unsigned long currentLowLength = currentLowEndedAt - currentLowStartedAt;
-  if (currentLowLength > FRAME_BEGIN_PULSE_MICROS) {
+  unsigned long currentLevelLength = currentLevelEndedAt - currentlevelStartedAt;
+
+  if (level == LOW) {
+    frameBuffer.concat("-");
+  } else if (level == HIGH) {
+    frameBuffer.concat("+");
+  }
+
+  frameBuffer.concat(currentLevelLength);
+  frameBuffer.concat(", ");
+
+  if (currentLevelLength > END_OF_MESSAGE_TIMEOUT_MICROSECONDS) {
     Serial.println(frameBuffer);
     frameBuffer = "";
   }
 
-  frameBuffer.concat("-");
-  frameBuffer.concat(currentLowLength);
-  frameBuffer.concat(", ");
+}
 
-  unsigned long currentHighStartedAt = micros();
-  while (digitalReadFast(REMOTE_DATA_PIN) == HIGH) { }
-
-  unsigned long currentHighEndedAt = micros();
-
-  unsigned long currentHighLength = currentHighEndedAt - currentHighStartedAt;
-  frameBuffer.concat("+");
-  frameBuffer.concat(currentHighLength);
-  frameBuffer.concat(", ");
+void loop() {
+  waitForLevelAndRecord(LOW);
+  waitForLevelAndRecord(HIGH);
 }
