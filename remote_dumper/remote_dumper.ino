@@ -43,11 +43,32 @@ between this pin and ground.
 // FOR ARDUINO DUE, USE: https://github.com/lobbesnl/digitalWriteFast
 #include <digitalWriteFast.h>
 
+// https://github.com/ivanseidel/DueTimer
+#include <DueTimer.h>
+
+String frameBuffer = "";
+
+volatile unsigned long currentLevelStartedAt = 0;
+volatile unsigned long previousLevelStartedAt = 0;
+volatile boolean breakNow = false;
+
+/* to avoid having that one last message stuck in the buffer while you're
+waiting for a level change, also periodically jump out of the level wait to
+force a buffer dump */
+void periodicallyDumpBuffer() {
+  if (currentLevelStartedAt == previousLevelStartedAt)
+    breakNow = true;
+
+  previousLevelStartedAt = currentLevelStartedAt;
+}
+
 void setup() {
   pinModeFast(REMOTE_DATA_PIN, INPUT);
 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
+
+  DueTimer::getAvailable().attachInterrupt(periodicallyDumpBuffer).start(1000000);// Calls every 1000ms
 
   Serial.begin(115200);
   Serial.println("Ready");
@@ -56,15 +77,17 @@ void setup() {
 /* any signal, high or low, that is longer than this will be treated as the end of one message and the beginning of another */
 #define END_OF_MESSAGE_TIMEOUT_MICROSECONDS 10000
 
-String frameBuffer = "";
-
 void waitForLevelAndRecord(boolean level) {
-  unsigned long currentlevelStartedAt = micros();
-  while (digitalReadFast(REMOTE_DATA_PIN) == level) {}
+  currentLevelStartedAt = micros();
+
+  while (digitalReadFast(REMOTE_DATA_PIN) == level) {
+    if (breakNow)
+      break;
+  }
 
   unsigned long currentLevelEndedAt = micros();
 
-  unsigned long currentLevelLength = currentLevelEndedAt - currentlevelStartedAt;
+  unsigned long currentLevelLength = currentLevelEndedAt - currentLevelStartedAt;
 
   if (level == LOW) {
     frameBuffer.concat("-");
@@ -76,10 +99,18 @@ void waitForLevelAndRecord(boolean level) {
   frameBuffer.concat(", ");
 
   if (currentLevelLength > END_OF_MESSAGE_TIMEOUT_MICROSECONDS) {
+    if (breakNow)
+      frameBuffer.concat("# wb");
+
     Serial.println(frameBuffer);
     frameBuffer = "";
   }
 
+  if (breakNow)
+    breakNow = false;
+
+
+  previousLevelStartedAt = 0;
 }
 
 void loop() {
