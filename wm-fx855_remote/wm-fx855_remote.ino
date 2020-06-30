@@ -43,9 +43,6 @@ between this pin and ground.
 */
 #define REMOTE_DATA_PIN 12
 
-// #include "Arduino.h"
-// #include "heltec.h"
-
 // https://github.com/khoih-prog/ESP32TimerInterrupt
 #include "ESP32TimerInterrupt.h"
 ESP32Timer ITimer0(0);
@@ -167,10 +164,6 @@ void IRAM_ATTR TimerHandler0(void) {
 }
 
 void setup() {
-  // Heltec.begin(true /*DisplayEnable Enable*/, false /*LoRa Disable*/, true /*Serial Enable*/);
-  // Wire.begin(SDA_OLED, SCL_OLED);
-  // pinMode(REMOTE_DATA_PIN, INPUT);
-
   Wire.begin(SDA_OLED, SCL_OLED);
   Wire.setClock(400000L);
 
@@ -234,12 +227,7 @@ unsigned long waitForLevelAndRecord(boolean level) {
   }
 
   unsigned long currentLevelEndedAt = micros();
-
   unsigned long currentLevelLength = currentLevelEndedAt - currentLevelStartedAt;
-
-  // if (currentLevelLength > END_OF_MESSAGE_TIMEOUT_MICROSECONDS) {
-  //   digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-  // }
 
   if (breakNow)
     breakNow = false;
@@ -325,7 +313,7 @@ void processPayload() {
       currentAction = ACTION_PLAYING;
     } else if (getBitsFromCommandByte(commandByte, 5, 1) == 0b00000001) {
       currentAction = ACTION_FF;
-    } else if (getBitsFromCommandByte(commandByte, 6, 1) == 0b00000001) {
+    } else if (getBitsFromCommandByte(commandByte, 5, 2) == 0b00000011) {
       currentAction = ACTION_REW;
     } else if (getBitsFromCommandByte(commandByte, 2, 1) == 0b00000001) {
       currentAction = ACTION_STOP;
