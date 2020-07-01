@@ -69,7 +69,10 @@ volatile boolean breakNow = false;
 /* any signal, high or low, that is longer than this will be treated as the end of one message and the beginning of another */
 #define END_OF_MESSAGE_TIMEOUT_MICROSECONDS 10000
 
-#define START_HIGH_MICROSECONDS 4900 // about 5ms
+// whenever the player is not sending a signal, delay this long each loop to avoid needlessly checking the same bool
+#define NO_SENDER_LOOP_DELAY_MICROSECONDS 500
+
+#define START_HIGH_MICROSECONDS 4900-NO_SENDER_LOOP_DELAY_MICROSECONDS // about 5ms, but add buffer for the interrupt to latch
 #define START_LOW_MICROSECONDS 1900 // about 2ms
 
 uint32_t currentCommandBytes = 0; // expected to contain 3 bytes
@@ -152,7 +155,7 @@ void updateDisplay() {
 }
 
 void IRAM_ATTR TimerHandler0(void) {
-  digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+  // digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 
   if (!inMessage)
     return;
@@ -161,6 +164,18 @@ void IRAM_ATTR TimerHandler0(void) {
     breakNow = true;
 
   previousLevelStartedAt = currentLevelStartedAt;
+}
+
+volatile boolean senderIsTransmitting = false;
+// volatile unsigned long lastMessageReceivedAtMicroseconds = 0;
+
+void IRAM_ATTR waitForHighISR() {
+  detachInterrupt(REMOTE_DATA_PIN);
+  senderIsTransmitting = true;
+}
+
+void attachWaitForHighInterrupt(){
+  attachInterrupt(REMOTE_DATA_PIN, waitForHighISR, RISING);
 }
 
 void setup() {
@@ -192,6 +207,8 @@ void setup() {
     Serial.println("Starting  ITimer0 OK, millis() = " + String(millis()));
   else
     Serial.println("Can't set ITimer0. Select another freq. or timer");
+
+  attachWaitForHighInterrupt();
 }
 
 // https://forum.arduino.cc/index.php?topic=42465.0
@@ -324,41 +341,50 @@ void processPayload() {
 }
 
 void loop() {
-  if (inMessage) {
-    unsigned long highPeriod = waitForLevelAndRecord(HIGH);
-    unsigned long lowPeriod = waitForLevelAndRecord(LOW);
+  if (senderIsTransmitting) {
+    digitalWrite(LED_BUILTIN, HIGH);
+    if (inMessage) {
+      unsigned long highPeriod = waitForLevelAndRecord(HIGH);
+      unsigned long lowPeriod = waitForLevelAndRecord(LOW);
 
-    if (lowPeriod >= END_OF_MESSAGE_TIMEOUT_MICROSECONDS) {
-      inMessage = false;
-      return;
-    }
+      if (lowPeriod >= END_OF_MESSAGE_TIMEOUT_MICROSECONDS) {
+        inMessage = false;
+        return;
+      }
 
-    byte currentBit = 0;
-    if ((highPeriod >= 1900) && (lowPeriod >= 550)) {
-      currentBit = 0b00000001;
-    } else if ((highPeriod >= 550) && (lowPeriod >= 1900)) {
-      currentBit = 0b00000000;
+      byte currentBit = 0;
+      if ((highPeriod >= 1900) && (lowPeriod >= 550)) {
+        currentBit = 0b00000001;
+      } else if ((highPeriod >= 550) && (lowPeriod >= 1900)) {
+        currentBit = 0b00000000;
+      } else {
+        // some kind of error, try again later
+        inMessage = false;
+        return;
+      }
+      currentCommandBytes = currentCommandBytes ^ currentBit;
+      currentCommandBytes = currentCommandBytes << 1;
     } else {
-      // some kind of error, try again later
-      inMessage = false;
-      return;
-    }
-    currentCommandBytes = currentCommandBytes ^ currentBit;
-    currentCommandBytes = currentCommandBytes << 1;
-
-  } else {
-    if (currentCommandBytes > 0) {
-      // not in a message but there are bytes to be processed, so that usually
-      // means we've received the whole message and now need to process it
-      processPayload();
-      currentCommandBytes = 0;
-    }
-
-    if (waitForLevelAndRecord(HIGH) >= START_HIGH_MICROSECONDS) {
-      if (waitForLevelAndRecord(LOW) >= START_LOW_MICROSECONDS) {
-        inMessage = true;
+      if (currentCommandBytes > 0) {
+        // not in a message but there are bytes to be processed, so that usually
+        // means we've received the whole message and now need to process it
+        processPayload();
         currentCommandBytes = 0;
+
+        senderIsTransmitting = false;
+        attachWaitForHighInterrupt();
+
+      }
+
+      if (waitForLevelAndRecord(HIGH) >= START_HIGH_MICROSECONDS) {
+        if (waitForLevelAndRecord(LOW) >= START_LOW_MICROSECONDS) {
+          inMessage = true;
+          currentCommandBytes = 0;
+        }
       }
     }
+  } else {
+    digitalWrite(LED_BUILTIN, LOW);
+    delayMicroseconds(NO_SENDER_LOOP_DELAY_MICROSECONDS);
   }
 }
