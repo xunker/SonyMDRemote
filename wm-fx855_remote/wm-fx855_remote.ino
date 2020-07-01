@@ -66,6 +66,9 @@ volatile unsigned long currentLevelStartedAt = 0;
 volatile unsigned long previousLevelStartedAt = 0;
 volatile boolean breakNow = false;
 
+unsigned long lastMessageReceivedAtMillis = 0;
+#define SLEEP_DISPLAY_AFTER_INACTIVITY_MILLISECONDS 30000
+
 /* any signal, high or low, that is longer than this will be treated as the end of one message and the beginning of another */
 #define END_OF_MESSAGE_TIMEOUT_MICROSECONDS 10000
 
@@ -428,6 +431,8 @@ void loop() {
         processPayload();
         currentCommandBytes = 0;
 
+        lastMessageReceivedAtMillis = millis();
+
         senderIsTransmitting = false;
         attachWaitForHighInterrupt();
 
@@ -442,6 +447,12 @@ void loop() {
     }
   } else {
     digitalWrite(LED_BUILTIN, LOW);
+    unsigned long currentMillis = millis();
+    if ((currentMillis > SLEEP_DISPLAY_AFTER_INACTIVITY_MILLISECONDS) && (lastMessageReceivedAtMillis < (currentMillis - SLEEP_DISPLAY_AFTER_INACTIVITY_MILLISECONDS))) {
+      lastMessageReceivedAtMillis = currentMillis;
+      // activity timeout, sleep the display
+      oled.clear();
+    }
     delayMicroseconds(NO_SENDER_LOOP_DELAY_MICROSECONDS);
   }
 }
