@@ -43,6 +43,14 @@ between this pin and ground.
 */
 #define REMOTE_DATA_PIN 12
 
+// blank the screen after xx seconds to preserve power and prevent wear
+#define ENABLE_SCREEN_BLANK
+
+#define ENABLE_SLEEP
+// to enable sleep, you will also need to separately set SLEEP_WAKEUP_PIN to
+// be the same pin as REMOTE_DATA_PIN using the GPIO_NUM_* macro
+#define SLEEP_WAKEUP_PIN GPIO_NUM_12
+
 // https://github.com/khoih-prog/ESP32TimerInterrupt
 #include "ESP32TimerInterrupt.h"
 ESP32Timer ITimer0(0);
@@ -67,7 +75,7 @@ volatile unsigned long previousLevelStartedAt = 0;
 volatile boolean breakNow = false;
 
 unsigned long lastMessageReceivedAtMillis = 0;
-#define SLEEP_DISPLAY_AFTER_INACTIVITY_MILLISECONDS 30000
+#define SLEEP_DISPLAY_AFTER_INACTIVITY_MILLISECONDS 10000
 
 /* any signal, high or low, that is longer than this will be treated as the end of one message and the beginning of another */
 #define END_OF_MESSAGE_TIMEOUT_MICROSECONDS 10000
@@ -75,7 +83,8 @@ unsigned long lastMessageReceivedAtMillis = 0;
 // whenever the player is not sending a signal, delay this long each loop to avoid needlessly checking the same bool
 #define NO_SENDER_LOOP_DELAY_MICROSECONDS 500
 
-#define START_HIGH_MICROSECONDS 4900-NO_SENDER_LOOP_DELAY_MICROSECONDS // about 5ms, but add buffer for the interrupt to latch
+// about 5ms, but add buffer for the interrupt to latch and to accoutn for waking from sleep
+#define START_HIGH_MICROSECONDS 4900-(NO_SENDER_LOOP_DELAY_MICROSECONDS+500)
 #define START_LOW_MICROSECONDS 1900 // about 2ms
 
 uint32_t currentCommandBytes = 0; // expected to contain 3 bytes
@@ -450,8 +459,16 @@ void loop() {
     unsigned long currentMillis = millis();
     if ((currentMillis > SLEEP_DISPLAY_AFTER_INACTIVITY_MILLISECONDS) && (lastMessageReceivedAtMillis < (currentMillis - SLEEP_DISPLAY_AFTER_INACTIVITY_MILLISECONDS))) {
       lastMessageReceivedAtMillis = currentMillis;
-      // activity timeout, sleep the display
-      oled.clear();
+      #ifdef ENABLE_SCREEN_BLANK
+        // activity timeout, sleep the display
+        oled.clear();
+      #endif
+
+      #ifdef ENABLE_SLEEP
+        // sleep
+        esp_sleep_enable_ext0_wakeup(SLEEP_WAKEUP_PIN, HIGH); //1 = High, 0 = Low
+        esp_light_sleep_start();
+      #endif
     }
     delayMicroseconds(NO_SENDER_LOOP_DELAY_MICROSECONDS);
   }
