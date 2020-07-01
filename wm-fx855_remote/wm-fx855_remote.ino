@@ -51,6 +51,9 @@ between this pin and ground.
 // be the same pin as REMOTE_DATA_PIN using the GPIO_NUM_* macro
 #define SLEEP_WAKEUP_PIN GPIO_NUM_12
 
+// turn the CPU down to 80mhz (from default 240) to save power
+#define LOW_CPU_SPEED
+
 // https://github.com/khoih-prog/ESP32TimerInterrupt
 #include "ESP32TimerInterrupt.h"
 ESP32Timer ITimer0(0);
@@ -59,6 +62,8 @@ ESP32Timer ITimer0(0);
 #include <Wire.h>
 #include "SSD1306Ascii.h"
 #include "SSD1306AsciiWire.h"
+
+#include "esp32-hal-cpu.h"
 
 // 0X3C+SA0 - 0x3C or 0x3D
 #define I2C_ADDRESS 0x3C
@@ -200,6 +205,10 @@ void attachWaitForHighInterrupt(){
 }
 
 void setup() {
+  #ifdef LOW_CPU_SPEED
+    setCpuFrequencyMhz(80); //Set CPU clock to 80MHz fo example
+  #endif
+
   Wire.begin(SDA_OLED, SCL_OLED);
   Wire.setClock(400000L);
 
@@ -211,10 +220,11 @@ void setup() {
 
   oled.displayRemap(true); // flip display
   oled.setFont(Verdana12);
-  // oled.setScrollMode(SCROLL_MODE_AUTO);
+  oled.setScrollMode(SCROLL_MODE_AUTO);
   oled.clear();
   oled.setCursor(0,0);
-  oled.print("WM-FX855 Remote");
+  oled.println("WM-FX855 Remote");
+  oled.print(getCpuFrequencyMhz()); oled.println("mHz mode");
 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
