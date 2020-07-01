@@ -91,7 +91,8 @@ uint8_t currentAction = ACTION_OFF;
 
 #define TAPE_MODE 0
 #define RADIO_MODE 1
-boolean functionMode = TAPE_MODE;
+#define UNKNOWN_MODE 99
+boolean functionMode = UNKNOWN_MODE;
 
 #define RADIO_AM 0b00000000
 #define RADIO_FM 0b00000010
@@ -100,6 +101,8 @@ uint8_t radioBand = RADIO_AM;
 uint16_t frequency = 0;
 
 uint8_t currentPreset = 0;
+
+uint8_t currentAmsIndex = 0;
 
 void updateDisplay() {
   oled.clear();
@@ -129,7 +132,7 @@ void updateDisplay() {
       oled.print(" huh?");
     }
 
-  } else {
+  } else if (functionMode == TAPE_MODE) {
     oled.print("TAPE");
 
     oled.setCursor(0, 2);
@@ -144,6 +147,13 @@ void updateDisplay() {
     } else {
       oled.print("????");
     }
+
+    if (currentAmsIndex > 0) {
+      oled.print(" AMS ");
+      oled.print(currentAmsIndex + 1);
+    }
+  } else {
+    oled.print("UNKNOWN MODE");
   }
 
   oled.setCursor(oled.displayWidth() - oled.fieldWidth(3), 5);
@@ -167,7 +177,6 @@ void IRAM_ATTR TimerHandler0(void) {
 }
 
 volatile boolean senderIsTransmitting = false;
-// volatile unsigned long lastMessageReceivedAtMicroseconds = 0;
 
 void IRAM_ATTR waitForHighISR() {
   detachInterrupt(REMOTE_DATA_PIN);
@@ -189,13 +198,11 @@ void setup() {
   #endif // RST_PIN >= 0
 
   oled.displayRemap(true); // flip display
-  // oled.setFont(System5x7);
-  // oled.setFont(font8x8);
   oled.setFont(Verdana12);
-  oled.setScrollMode(SCROLL_MODE_AUTO);
+  // oled.setScrollMode(SCROLL_MODE_AUTO);
   oled.clear();
   oled.setCursor(0,0);
-  oled.print("Hello world!");
+  oled.print("WM-FX855 Remote");
 
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, LOW);
@@ -254,90 +261,140 @@ unsigned long waitForLevelAndRecord(boolean level) {
   return currentLevelLength;
 }
 
+void processRadioMessage(uint8_t commandByte, uint16_t attributeBytes) {
+  currentPreset = getBitsFromCommandByte(commandByte, 0, 5);
+  radioBand = getBitsFromAttributeBytes(attributeBytes, 0, 2);
+  if (radioBand == RADIO_AM) {
+    // check if it's really TV mode
+    if (getBitsFromAttributeBytes(attributeBytes, 6, 2) == 0b00000011) {
+      radioBand = RADIO_TV;
+    }
+  }
+  frequency = 0;
+
+  if (radioBand == RADIO_AM) {
+    uint8_t ones = getBitsFromAttributeBytes(attributeBytes, 4, 4);
+    frequency = frequency + ones;
+
+    uint8_t tens = getBitsFromAttributeBytes(attributeBytes, 8, 4);
+    frequency = frequency + (10 * tens);
+
+    uint8_t hundreds = getBitsFromAttributeBytes(attributeBytes, 12, 4);
+    frequency = frequency + (100 * hundreds);
+
+    uint8_t thousands = getBitsFromAttributeBytes(attributeBytes, 2, 2);
+    frequency = frequency + (1000 * thousands);
+  } else if (radioBand == RADIO_FM) {
+    uint8_t ones = getBitsFromAttributeBytes(attributeBytes, 8, 4);
+    frequency = frequency + (10 * ones);
+
+    uint8_t tens = getBitsFromAttributeBytes(attributeBytes, 12, 4);
+    frequency = frequency + (100 * tens);
+
+    uint8_t hundreds = getBitsFromAttributeBytes(attributeBytes, 2, 2);
+    frequency = frequency + (1000 * hundreds);
+
+    uint8_t decimal = getBitsFromAttributeBytes(attributeBytes, 4, 4);
+    frequency = frequency + decimal;
+  } else if (radioBand == RADIO_TV) {
+    uint8_t ones = getBitsFromAttributeBytes(attributeBytes, 12, 4);
+    frequency = frequency + (1 * ones);
+
+    uint8_t tens = getBitsFromAttributeBytes(attributeBytes, 2, 2);
+    frequency = frequency + (10 * tens);
+  }
+}
+
+void processTapeMessage(uint8_t commandByte) {
+  if (getBitsFromCommandByte(commandByte, 4, 1) == 0b00000001) {
+    tapeDirection = PLAYING_REV;
+  } else {
+    tapeDirection = PLAYING_FWD;
+  }
+
+  if ((commandByte & 0b01100000) == 0b01100000) {
+    // unknown use
+    return;
+  } else if ((commandByte & 0b00100000) == 0b00100000) {
+    currentAction = ACTION_FF;
+    // get AMS index from last four
+    currentAmsIndex = getBitsFromCommandByte(commandByte, 0, 4);
+  } else if ((commandByte & 0b01000000) == 0b01000000) {
+    currentAction = ACTION_REW;
+    // get AMS index from last four
+    currentAmsIndex = getBitsFromCommandByte(commandByte, 0, 4);
+  } else {
+    currentAmsIndex = 0;
+    if ((commandByte & 0b00000100) == 0b00000100) {
+      currentAction = ACTION_STOP;
+    } else if ((commandByte & 0b00001000) == 0b00001000) {
+      currentAction = ACTION_PLAYING;
+    }
+  }
+}
+
+void printBinary(uint8_t bin) {
+  char buffer[9];
+  char buffer2[9];
+  itoa (bin,buffer,2);
+  sprintf(buffer2, "%08s", buffer);
+  Serial.print(buffer2);
+}
+
+void printlnBinary(uint8_t bin) {
+
+}
+
 void processPayload() {
   uint8_t commandByte = getCommandByte(currentCommandBytes);
   uint16_t attributeBytes = getAttributeBytes(currentCommandBytes);
 
-  // Serial.println(currentCommandBytes, BIN);
+  char commandBuffer[9];
+  char commandBuffer2[9];
+  itoa (commandByte,commandBuffer,2);
+  sprintf(commandBuffer2, "%08s", commandBuffer);
+
   if (attributeBytes > 0) {
-    Serial.print(commandByte, BIN);
+    char attributesBuffer[17];
+    char attributesBuffer2[17];
+    itoa (attributeBytes,attributesBuffer,2);
+    sprintf(attributesBuffer2, "%016s", attributesBuffer);
+
+    Serial.print(commandBuffer2);
     Serial.print(" ");
-    Serial.println(attributeBytes, BIN);
+    Serial.println(attributesBuffer2);
   } else {
-    Serial.println(commandByte, BIN);
+    Serial.println(commandBuffer2);
   }
 
-  if ((getBitsFromCommandByte(commandByte, 6, 1) == 0b00000001) && (attributeBytes > 0)) {
-    functionMode = RADIO_MODE;
-
-    currentPreset = getBitsFromCommandByte(commandByte, 0, 5);
-    radioBand = getBitsFromAttributeBytes(attributeBytes, 0, 2);
-    if (radioBand == RADIO_AM) {
-      // check if it's really TV mode
-      if (getBitsFromAttributeBytes(attributeBytes, 6, 2) == 0b00000011) {
-        radioBand = RADIO_TV;
-      }
+  /* There's probably a better way to deduce the current mode (radio or tape)
+  using the bits in the command byte, but instead we just assume that if there
+  are no Attributes bytes are present after the command byte, then we are in
+  tape mode. */
+  if (attributeBytes > 0) {
+    if (getBitsFromCommandByte(commandByte, 6, 2) == 0b00000011) {
+      functionMode = RADIO_MODE;
+      processRadioMessage(commandByte, attributeBytes);
+    } else {
+      functionMode == UNKNOWN_MODE;
     }
-    frequency = 0;
-
-    if (radioBand == RADIO_AM) {
-      uint8_t ones = getBitsFromAttributeBytes(attributeBytes, 4, 4);
-      frequency = frequency + ones;
-
-      uint8_t tens = getBitsFromAttributeBytes(attributeBytes, 8, 4);
-      frequency = frequency + (10 * tens);
-
-      uint8_t hundreds = getBitsFromAttributeBytes(attributeBytes, 12, 4);
-      frequency = frequency + (100 * hundreds);
-
-      uint8_t thousands = getBitsFromAttributeBytes(attributeBytes, 2, 2);
-      frequency = frequency + (1000 * thousands);
-    } else if (radioBand == RADIO_FM) {
-      uint8_t ones = getBitsFromAttributeBytes(attributeBytes, 8, 4);
-      frequency = frequency + (10 * ones);
-
-      uint8_t tens = getBitsFromAttributeBytes(attributeBytes, 12, 4);
-      frequency = frequency + (100 * tens);
-
-      uint8_t hundreds = getBitsFromAttributeBytes(attributeBytes, 2, 2);
-      frequency = frequency + (1000 * hundreds);
-
-      uint8_t decimal = getBitsFromAttributeBytes(attributeBytes, 4, 4);
-      frequency = frequency + decimal;
-    } else if (radioBand == RADIO_TV) {
-      uint8_t ones = getBitsFromAttributeBytes(attributeBytes, 12, 4);
-      frequency = frequency + (1 * ones);
-
-      uint8_t tens = getBitsFromAttributeBytes(attributeBytes, 2, 2);
-      frequency = frequency + (10 * tens);
+    updateDisplay();
+  } else {
+    /* "skippable" messages: don't know that they mean, but we've functioned long enough without them! */
+    switch (commandByte){
+      case 0b01100000:
+        // send whenever radio frequency changes (at turn on or button), regardless of tape direction
+        if (functionMode == RADIO_MODE)
+          return;
     }
-
-    if (getBitsFromCommandByte(commandByte, 5, 1) == 0b00000000) {
-      tapeDirection = PLAYING_FWD;
-    } else if (getBitsFromCommandByte(commandByte, 5, 1) == 0b00000001) {
-      tapeDirection = PLAYING_REV;
-    }
-  } else if (getBitsFromCommandByte(commandByte, 6, 1) == 0b00000000) {
-    functionMode = TAPE_MODE;
-
-    if (getBitsFromCommandByte(commandByte, 4, 1) == 0b00000000) {
-      tapeDirection = PLAYING_FWD;
-    } else if (getBitsFromCommandByte(commandByte, 4, 1) == 0b00000001) {
-      tapeDirection = PLAYING_REV;
-    }
-
-    if (getBitsFromCommandByte(commandByte, 3, 1) == 0b00000001) {
-      currentAction = ACTION_PLAYING;
-    } else if (getBitsFromCommandByte(commandByte, 5, 1) == 0b00000001) {
-      currentAction = ACTION_FF;
-    } else if (getBitsFromCommandByte(commandByte, 5, 2) == 0b00000011) {
-      currentAction = ACTION_REW;
-    } else if (getBitsFromCommandByte(commandByte, 2, 1) == 0b00000001) {
-      currentAction = ACTION_STOP;
+    if (getBitsFromCommandByte(commandByte, 7, 1) == 0b0000000) {
+      functionMode = TAPE_MODE;
+      processTapeMessage(commandByte);
+      updateDisplay();
     }
   }
 
-  updateDisplay();
+
 }
 
 void loop() {
