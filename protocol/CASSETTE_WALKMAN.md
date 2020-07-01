@@ -44,56 +44,67 @@ If the message is 24-bits long, there is a 2ms low between the first 8 bits and 
 
 ### First Byte
 
-Radio Mode:
+Starting from MSB (left-most), the first bit indicate the type of message this is about:
+* `1`: radio, indicates we are currently listening to the radio
+* `0`: tape related, either we are in tape mode or it is information about the current tape state
 
-Position (MSB First) | Meaning
----------------------|---------------------------------
-0                    | 1 indicates radio mode if extra 2 bytes present
-1                    | 1 indicates radio mode if extra 2 bytes present
-2                    | Tape direction, 1 = rev, 0 = fwd
-3                    | ?
-4..7                 | Current preset number as BCD
+#### Radio Message
 
-Tape Mode (Playing Normally):
+Index (MSB First) | Meaning
+------------------|---------------------------------
+0                 | message type (`1` = radio)
+1                 | ? (always `1` in radio mode)
+2                 | Tape direction, `0` = fwd, `1` = rev
+3                 | ?
+4..7              | Current preset number as BCD
 
-Position (MSB First) | Meaning
----------------------|----------------------------------
-0                    | 0 indicates tape mode
-1                    | 1 indicates currently Rewinding
-2                    | 1 indicates currently Fast-forwarding
-3                    | Tape direction, 1 = rev, 0 = fwd
-4                    | Play
-5                    | Stop
-6                    | ?
-7                    | ?
+#### Tape Message
 
-Tape Mode (while Fast-Forwarding or Rewinding):
+Upper nibble:
 
-Position (MSB First) | Meaning
----------------------|--------------------------------------
-0                    | 0 indicates tape mode
-1                    | 1 indicates currently Rewinding
-2                    | 1 indicates currently Fast-forwarding
-3                    | Tape direction, 1 = rev, 0 = fwd
-4..7                 | BCD of current "AMS" selection
+Index (MSB First) | Meaning
+------------------|----------------------------------
+0                 | message type (`0` = tape)
+1..2              | current action (see list below)
+3                 | Tape direction, `0` = fwd, `1` = rev
+
+Value for `current action` can be:
+* `00`: playing or stopped
+* `10`: rewinding
+* `01`: fast-forwarding
+* `11`: state indicator?
+  - unsure about this, it seems to only be used to update the tape direction
+
+Lower nibble for playing or stopped:
+
+Index (MSB First) | Meaning
+------------------|--------------------------------------
+4..5              | `10` = playing, `01` = stopped
+6..7              | ?
+
+Lower nibble for fast-forwarding or rewinding:
+
+Index (MSB First) | Meaning
+------------------|--------------------------------------
+4..7              | BCD of current "AMS" counter
 
 ### Second and Third Bytes
 
 In tape mode, only the first byte is sent and these additional bytes are not sent. In radio mode, these bytes indicate the current frequency and frequency band.
 
-Index (MSB) | Index (LSB) | FM Mode       | AM Mode       | TV Mode             |
-------------|-------------|---------------|---------------|---------------------|
-0..3        | 12..15      | Tens          | Hundreds      | Ones                |
-4..7        | 8..11       | Ones          | Tens          | Unused              |
-8..11       | 4..7        | Tenths        | Ones          | 1100(MSB) = TV mode |
-12..13      | 2..3        | Hundreds      | Thousands     | Tens                |
-14..15      | 0..1        | Band          | Band          | Band                |
+Index (MSB) | FM Mode       | AM Mode       | TV Mode             |
+------------|---------------|---------------|---------------------|
+0..3        | Tens          | Hundreds      | Ones                |
+4..7        | Ones          | Tens          | Unused              |
+8..11       | Tenths        | Ones          | `1100` = TV mode    |
+12..13      | Hundreds      | Thousands     | Tens                |
+14..15      | Band          | Band          | Band                |
 
 `Band` fields:
 * `10`: FM
-* `00`:
-  - AM mode if "ones"/"tv mode" field is less than 12 (1100 MSB)
-  - TV mode if "ones" field is equal to 12 (1100 MSB)
+* `00`: Depends on the value of field `8..11`:
+  - AM mode if 8..11 field does not equal `1100`
+  - TV mode if 8..11 field equals `1100`
 
 Examples:
 * `11000001 1001011101010010` (97.5mHz, preset 1)
@@ -108,20 +119,6 @@ Examples:
 * `11000000 0001000011000000` (TV 1ch, no preset)
 * `11000000 0010000011000000` (TV 2ch, no preset)
 * `11000000 0011000011000000` (TV 3ch, no preset)
-* `11000000 0100000011000000` (TV 4ch, no preset)
-* `11000000 0101000011000000` (TV 5ch, no preset)
-* `11000000 0110000011000000` (TV 6ch, no preset)
-* `11000000 0111000011000000` (TV 7ch, no preset)
-* `11000000 1000000011000000` (TV 8ch, no preset)
-* `11000000 1001000011000000` (TV 9ch, no preset)
 * `11000000 0000000011000100` (TV 10ch, no preset)
 * `11000000 0001000011000100` (TV 11ch, no preset)
 * `11000000 0010000011000100` (TV 12ch, no preset)
-
-
-
-11000000 0111011010000010 fm 76.8
-11000000 1001000000000010 fm 90.0
-11000000 0111011000000010 fm 76.0
-11000000 0111011010000010 fm 76.8
-
