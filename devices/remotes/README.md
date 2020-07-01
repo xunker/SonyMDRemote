@@ -46,6 +46,8 @@ Remote Controls
 - RM-MZ35
 - RM-MZ4R
   * "Editing" remote that shipped with MZ-R700 and North American [MZ-N707](https://minidisc.org/part_Sony_MZ-N707.html)
+- RM-MZB10
+  * Shipped with [MZ-B10](https://www.minidisc.org/part_Sony_MZ-B10.html)
 - RM-MZR4MP
   * Shipped with [MZ-R30](https://minidisc.org/part_Sony_MZ-R30.html)
 - RM-MZE1
