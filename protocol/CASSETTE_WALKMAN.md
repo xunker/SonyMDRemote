@@ -46,47 +46,67 @@ If the message is 24-bits long, there is a 2ms low between the first 8 bits and 
 
 Starting from MSB (left-most), the first bit indicate the type of message this is about:
 * `1`: radio, indicates we are currently listening to the radio
-* `0`: tape related, either we are in tape mode or it is information about the current tape state
+* `0`: tape/state related, either we are in tape mode or it is information about the tape/system state
 
 #### Radio Message
 
 Index (MSB First) | Meaning
-------------------|---------------------------------
+------------------|------------------------------------------------
 0                 | message type (`1` = radio)
-1                 | ? (always `1` in radio mode)
+1                 | `1` = normal listening, `0` = ASP learning mode
 2                 | Tape direction, `0` = fwd, `1` = rev
 3                 | ?
 4..7              | Current preset number as BCD
 
-#### Tape Message
+Messages beginning with `11` (Radio message, normal listening mode) will always include an additional 2 bytes of extra attribute data representing the current radio tuning.
 
-Upper nibble:
+When the ASP process begins (long-pressing the ASP button) the message `10010000` is sent, and when the process is complete the message `10101010` is sent and that a standard station tuning message. However, when only a specific band is scanned (long-pressing the enter button) then `10101010` is sent at the start and standard station tuning message is sent at the end.
+
+#### Tape or State Message
+
+##### Upper 3 bits
 
 Index (MSB First) | Meaning
 ------------------|----------------------------------
 0                 | message type (`0` = tape)
 1..2              | current action (see list below)
-3                 | Tape direction, `0` = fwd, `1` = rev
 
 Value for `current action` can be:
 * `00`: playing or stopped
 * `10`: rewinding
 * `01`: fast-forwarding
-* `11`: state indicator?
-  - unsure about this, it seems to only be used to update the tape direction
+* `11`: state indicator
 
-Lower nibble for playing or stopped:
+##### Lower 5 bits for playing or stopped:
 
 Index (MSB First) | Meaning
 ------------------|--------------------------------------
+3                 | Tape direction, `0` = fwd, `1` = rev
 4..5              | `10` = playing, `01` = stopped
-6..7              | ?
+6..7              | ? (MT_WZL indicator)
 
-Lower nibble for fast-forwarding or rewinding:
+##### Lower 5 bits for fast-forwarding or rewinding:
 
 Index (MSB First) | Meaning
 ------------------|--------------------------------------
+3                 | Tape direction, `0` = fwd, `1` = rev
 4..7              | BCD of current "AMS" counter
+
+##### Lower 5 bits for "state indicator"
+
+Index (MSB First) | Meaning
+------------------|------------------------------------------------
+3                 | Current mode (`0` = radio, `1` = tape) (unsure)
+4                 | ? (MT_WZL indicator)
+5..7              | BCD of Bass Boost level (0,4, or 6)
+
+The purpose of bit 3 s based on these observations ("xxxx" is the Bass Boost level and can be ignored for these examples):
+* Turning on radio from an off state, `0110xxxx` is sent
+* Playing a tape from an off state, `0111xxxx` is sent
+* *Sometimes*, switching from tape to radio will cause `0111xxxx` and `0110xxxx` to be sent in a pair
+* Pressing stop from radio mode, `0111xxxx` is sent
+* Pressing stop from tape mode, *no* "status indicator" message is sent
+* From stopped state, pressing fast-forward or rewind: `0110xxxx` is sent
 
 ### Second and Third Bytes
 
