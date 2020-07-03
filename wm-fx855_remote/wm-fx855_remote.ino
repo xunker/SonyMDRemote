@@ -1,35 +1,25 @@
 /*
 
-Receive and dump LCD display commands from a Sony Minidisc Remote Control port
+Remote control for Sony WM-FX855 Cassette Walkman
 Matthew Nielsen (C) 2020
 https://github.com/xunker/SonyMDRemote
 
-This will record the LCD control signals being sent from the remote control data
-pin of a Sony Minidisc remote control port (TRS+4-pin jack), and will dump that
-data to the serial console as a series of individual messages.
+Made to replace the OEM remote control for the WM-FX755 Walkman. Provides
+feedback on OLED display and can send remote control commands.
 
-This is *NOT* for reading transport control messages (play, pause, etc).
+Based on the Heltec ESP32-based "WiFi Kit 32" with built-in OLED display, but
+any ESP32 with a connected OLED should work.
 
-This is targeted at the Arduino Due for its high clock speed. Other
-microcontrollers may work if they can read from a pin at ~1 microsecond
-intervals.
+Signals from walkman must be boosted from their 1.4v logic level to something
+the ESP32 can read using a comparator circuit.
 
-This sketch continually polls REMOTE_DATA_PIN and records when it changes from
-HIGH to LOW. It watches for the signal that marks the beginning of a new message
-and groups high/low signals by those markers. When a complete message is
-received, it is sent to the serial console on a single line for easy parsing.
+Sending commands to the Walkman done using MCP4251 digital potentiometer.
 
-The data sent to the serial console is formatted so it can be easily
-copy/paste'd in to the complimentary `remote_sender.ino` sketch.
-
-For player devices that will pull the data line high, a high-value resistor
-between the data line and the signal ground is recommended for clear readings.
-I have used 100k to 470k with success.
-
-If your player device uses VCC of less than 3 volts (devices made around 2004 or
-later generally), you may have trouble reading the high/low signals with a 5v
-microcontroller. I recommend a using 3.3v microcontroller.
-
+Uses:
+* https://github.com/khoih-prog/ESP32TimerInterrupt
+* SSD1306 arduino library
+* https://forum.arduino.cc/index.php?topic=42465.0
+* https://arduino.stackexchange.com/questions/55805/spi-digital-potentiometer-not-working-on-esp32
 */
 
 #ifndef ESP32
@@ -37,11 +27,10 @@ microcontroller. I recommend a using 3.3v microcontroller.
 #endif
 
 /*
-This is the pin that will receiev the data from the player. If your device
-uses "active-low" to send data I recommend you connect a 100k-470k resistor
-between this pin and ground.
+This is the pin that will receive the data from the player. Will need to be
+boosted by a comparator circuit or else the ESP32 won't be able to "see" it.
 */
-#define REMOTE_DATA_PIN 12
+#define REMOTE_DATA_PIN 14
 
 // blank the screen after xx seconds to preserve power and prevent wear
 #define ENABLE_SCREEN_BLANK
@@ -49,7 +38,7 @@ between this pin and ground.
 #define ENABLE_SLEEP
 // to enable sleep, you will also need to separately set SLEEP_WAKEUP_PIN to
 // be the same pin as REMOTE_DATA_PIN using the GPIO_NUM_* macro
-#define SLEEP_WAKEUP_PIN GPIO_NUM_12
+#define SLEEP_WAKEUP_PIN GPIO_NUM_14
 
 // turn the CPU down to 80mhz (from default 240) to save power
 #define LOW_CPU_SPEED
@@ -64,6 +53,10 @@ ESP32Timer ITimer0(0);
 #include "SSD1306AsciiWire.h"
 
 #include "esp32-hal-cpu.h"
+
+#define MCP4251_SHUTDOWN_PIN 27
+#define MCP4251_CS_PIN 5 // 5 VSPI, 15 HSPI
+#include "mcp4251.h"
 
 // 0X3C+SA0 - 0x3C or 0x3D
 #define I2C_ADDRESS 0x3C
@@ -86,7 +79,7 @@ unsigned long lastMessageReceivedAtMillis = 0;
 #define END_OF_MESSAGE_TIMEOUT_MICROSECONDS 10000
 
 // whenever the player is not sending a signal, delay this long each loop to avoid needlessly checking the same bool
-#define NO_SENDER_LOOP_DELAY_MICROSECONDS 500
+#define NO_SENDER_LOOP_DELAY_MICROSECONDS 200
 
 // about 5ms, but add buffer for the interrupt to latch and to accoutn for waking from sleep
 #define START_HIGH_MICROSECONDS 4900-(NO_SENDER_LOOP_DELAY_MICROSECONDS+500)
@@ -121,6 +114,8 @@ uint8_t currentPreset = 0;
 
 uint8_t currentAmsIndex = 0;
 
+uint8_t currentBassBoost = 0;
+
 void updateDisplay() {
   oled.clear();
 
@@ -153,16 +148,22 @@ void updateDisplay() {
     oled.print("TAPE");
 
     oled.setCursor(0, 2);
-    if (currentAction == ACTION_PLAYING) {
-      oled.print("PLAY");
-    } else if (currentAction == ACTION_REW) {
-      oled.print("REW");
-    } else if (currentAction == ACTION_FF) {
-      oled.print("FF");
-    } else if (currentAction == ACTION_STOP) {
-      oled.print("STOP");
-    } else {
-      oled.print("????");
+    switch (currentAction){
+      case ACTION_PLAYING:
+        oled.print("PLAY");
+        break;
+      case ACTION_REW:
+        oled.print("REW");
+        break;
+      case ACTION_FF:
+        oled.print("FF");
+        break;
+      case ACTION_STOP:
+        oled.print("STOP");
+        break;
+      default:
+        oled.print("????");
+        break;
     }
 
     if (currentAmsIndex > 0) {
@@ -204,6 +205,13 @@ void attachWaitForHighInterrupt(){
   attachInterrupt(REMOTE_DATA_PIN, waitForHighISR, RISING);
 }
 
+void sendRemoteCommand(uint8_t potPos) {
+  digitalPotWrite(potPos);
+  wakeDigitalPot();
+  delay(100);
+  shutdownDigitalPot();
+}
+
 void setup() {
   #ifdef LOW_CPU_SPEED
     setCpuFrequencyMhz(80); //Set CPU clock to 80MHz fo example
@@ -219,7 +227,7 @@ void setup() {
   #endif // RST_PIN >= 0
 
   oled.displayRemap(true); // flip display
-  oled.setFont(Verdana12);
+  oled.setFont(Callibri15);
   oled.setScrollMode(SCROLL_MODE_AUTO);
   oled.clear();
   oled.setCursor(0,0);
@@ -236,6 +244,8 @@ void setup() {
     Serial.println("Starting  ITimer0 OK, millis() = " + String(millis()));
   else
     Serial.println("Can't set ITimer0. Select another freq. or timer");
+
+  mcp4251Setup();
 
   attachWaitForHighInterrupt();
 }
@@ -355,16 +365,10 @@ void processTapeMessage(uint8_t commandByte) {
   }
 }
 
-void printBinary(uint8_t bin) {
-  char buffer[9];
-  char buffer2[9];
-  itoa (bin,buffer,2);
-  sprintf(buffer2, "%08s", buffer);
-  Serial.print(buffer2);
-}
-
-void printlnBinary(uint8_t bin) {
-
+// messages that begin with 011
+void processStateMessage(uint8_t commandByte) {
+  // todo modal message for bass boost
+  currentBassBoost = getBitsFromCommandByte(commandByte, 0, 3);
 }
 
 void processPayload() {
@@ -403,11 +407,10 @@ void processPayload() {
     updateDisplay();
   } else {
     /* "skippable" messages: don't know that they mean, but we've functioned long enough without them! */
-    switch (commandByte){
-      case 0b01100000:
-        // send whenever radio frequency changes (at turn on or button), regardless of tape direction
-        if (functionMode == RADIO_MODE)
-          return;
+    if (getBitsFromCommandByte(commandByte, 5, 3) == 0b00000011) {
+      processStateMessage(commandByte);
+      // // send whenever radio frequency changes (at turn on or button), regardless of tape direction
+      // return;
     }
     if (getBitsFromCommandByte(commandByte, 7, 1) == 0b0000000) {
       functionMode = TAPE_MODE;
@@ -466,6 +469,10 @@ void loop() {
     }
   } else {
     digitalWrite(LED_BUILTIN, LOW);
+
+    // keep this delay *before* the sleep. We don't want the MCU to wake from sleep and then immediately delay!
+    delayMicroseconds(NO_SENDER_LOOP_DELAY_MICROSECONDS);
+
     unsigned long currentMillis = millis();
     if ((currentMillis > SLEEP_DISPLAY_AFTER_INACTIVITY_MILLISECONDS) && (lastMessageReceivedAtMillis < (currentMillis - SLEEP_DISPLAY_AFTER_INACTIVITY_MILLISECONDS))) {
       lastMessageReceivedAtMillis = currentMillis;
@@ -475,11 +482,13 @@ void loop() {
       #endif
 
       #ifdef ENABLE_SLEEP
+        detachInterrupt(REMOTE_DATA_PIN);
+        senderIsTransmitting = true;
         // sleep
-        esp_sleep_enable_ext0_wakeup(SLEEP_WAKEUP_PIN, HIGH); //1 = High, 0 = Low
+        esp_sleep_enable_ext0_wakeup(SLEEP_WAKEUP_PIN, HIGH);
         esp_light_sleep_start();
       #endif
     }
-    delayMicroseconds(NO_SENDER_LOOP_DELAY_MICROSECONDS);
+
   }
 }
