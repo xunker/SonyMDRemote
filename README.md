@@ -27,7 +27,7 @@ but it also appears on many other Sony devices. This is NOT an exhaustive list:
     - AM-NX1, AM-F90, AM-PX3, AM-PX1
 * some Discman and CD-Walkman players, including:
   - D-11, D-66, D-99 (1990)
-  - D-350 (1991)
+  - D-303, D-350 (1991), D-35
   - D-EJ815 (2000)
   - CRX10U portable USB CD-R/RW drive
   - few Aiwa players:
