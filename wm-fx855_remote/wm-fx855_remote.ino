@@ -30,7 +30,52 @@ Uses:
 This is the pin that will receive the data from the player. Will need to be
 boosted by a comparator circuit or else the ESP32 won't be able to "see" it.
 */
-#define REMOTE_DATA_PIN 14
+#define REMOTE_DATA_PIN 27
+
+// outside in
+const uint8_t buttonPins[] = {
+  // 36,
+  //skipped 37,
+  // 38,
+  // skipped 39,
+  // 34,
+  // skipped 35,
+  // 32,
+  // skipped 33,
+  // 25, // collides with builtin led
+  // 26,
+  // skipped 14,
+  12,
+  // skipped 13, RST, 3v3, 5v, gnd
+};
+#define PIN_BAND buttonPins[0]
+
+volatile uint8_t remoteCommandPending = 0;
+// number is the digipot divisions to send
+#define REMOTE_COMMAND_BAND 10
+// #define REMOTE_COMMAND_PLAY 2
+// #define REMOTE_COMMAND_STOP 3
+// #define REMOTE_COMMAND_REV 4
+// #define REMOTE_COMMAND_FWD 5
+// #define REMOTE_COMMAND_MEGA_BASS 6
+
+#define REMOTE_COMMAND_BAND_LABEL 0 // index to commandLabels
+#define REMOTE_COMMAND_PLAY_LABEL 1
+#define REMOTE_COMMAND_STOP_LABEL 2
+#define REMOTE_COMMAND_REV_LABEL 3
+#define REMOTE_COMMAND_FWD_LABEL 4
+#define REMOTE_COMMAND_MEGA_BASS_LABEL 5
+
+// pointer to label in list
+volatile uint8_t remoteCommandPendingLabel = 0;
+const String commandLabels[] = {
+  "band",
+  "play",
+  "stop",
+  "prev",
+  "next",
+  "bass"
+};
 
 // blank the screen after xx seconds to preserve power and prevent wear
 #define ENABLE_SCREEN_BLANK
@@ -38,7 +83,7 @@ boosted by a comparator circuit or else the ESP32 won't be able to "see" it.
 #define ENABLE_SLEEP
 // to enable sleep, you will also need to separately set SLEEP_WAKEUP_PIN to
 // be the same pin as REMOTE_DATA_PIN using the GPIO_NUM_* macro
-#define SLEEP_WAKEUP_PIN GPIO_NUM_14
+#define SLEEP_WAKEUP_PIN GPIO_NUM_27 // RTC_GPIO17
 
 // turn the CPU down to 80mhz (from default 240) to save power
 #define LOW_CPU_SPEED
@@ -54,7 +99,7 @@ ESP32Timer ITimer0(0);
 
 #include "esp32-hal-cpu.h"
 
-#define MCP4251_SHUTDOWN_PIN 27
+#define MCP4251_SHUTDOWN_PIN 13
 #define MCP4251_CS_PIN 5 // 5 VSPI, 15 HSPI
 #include "mcp4251.h"
 
@@ -79,7 +124,8 @@ unsigned long lastMessageReceivedAtMillis = 0;
 #define END_OF_MESSAGE_TIMEOUT_MICROSECONDS 10000
 
 // whenever the player is not sending a signal, delay this long each loop to avoid needlessly checking the same bool
-#define NO_SENDER_LOOP_DELAY_MICROSECONDS 200
+// only applicable if ENABLE_SLEEP is *not* enabled
+#define NO_SENDER_LOOP_DELAY_MICROSECONDS 100
 
 // about 5ms, but add buffer for the interrupt to latch and to accoutn for waking from sleep
 #define START_HIGH_MICROSECONDS 4900-(NO_SENDER_LOOP_DELAY_MICROSECONDS+500)
@@ -115,6 +161,22 @@ uint8_t currentPreset = 0;
 uint8_t currentAmsIndex = 0;
 
 uint8_t currentBassBoost = 0;
+
+// indicates display need to be redrawn
+volatile boolean displayDirty = false;
+// indicates remote command portion of display only need to be redrawn
+volatile boolean displayRemoteCommandDirty = false;
+
+// show current remote control command being executed on screen
+void updateCurrentCommand() {
+  if (remoteCommandPending > 0) {
+    oled.setCursor(0, 5);
+    oled.print(commandLabels[remoteCommandPendingLabel]);
+  } else {
+    oled.clearField(0, 5, 5);
+  }
+
+}
 
 void updateDisplay() {
   oled.clear();
@@ -180,21 +242,29 @@ void updateDisplay() {
   } else {
     oled.print("REV");
   }
+
+  updateCurrentCommand();
 }
+
+volatile boolean senderIsTransmitting = false;
 
 void IRAM_ATTR TimerHandler0(void) {
   // digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 
-  if (!inMessage)
+  if (!inMessage) {
+    if ((senderIsTransmitting) && (currentLevelStartedAt == previousLevelStartedAt)) {
+      // indicates we're polling needlessly
+      senderIsTransmitting = false;
+      previousLevelStartedAt = currentLevelStartedAt;
+    }
     return;
+  }
 
   if (currentLevelStartedAt == previousLevelStartedAt)
     breakNow = true;
 
   previousLevelStartedAt = currentLevelStartedAt;
 }
-
-volatile boolean senderIsTransmitting = false;
 
 void IRAM_ATTR waitForHighISR() {
   detachInterrupt(REMOTE_DATA_PIN);
@@ -206,15 +276,54 @@ void attachWaitForHighInterrupt(){
 }
 
 void sendRemoteCommand(uint8_t potPos) {
+  Serial.println("Sending " + String(potPos, DEC));
   digitalPotWrite(potPos);
   wakeDigitalPot();
-  delay(100);
+  delay(500);
   shutdownDigitalPot();
+}
+
+// to be called from xTaskCreate
+void sendRemoteCommandPending(void * parameter) {
+
+  sendRemoteCommand(remoteCommandPending);
+  remoteCommandPending = 0;
+  displayRemoteCommandDirty = true;
+  vTaskDelete(NULL);
+}
+
+void sendScheduledButton() {
+  if (remoteCommandPending == 0)
+    return;
+
+  displayRemoteCommandDirty = true;
+
+  xTaskCreate(
+    sendRemoteCommandPending,
+    "sendRemoteCommandPending",
+    10000, //stack size
+    NULL, // args
+    0, // priority
+    NULL //task handle
+  );
+}
+
+void scheduleBandButton() {
+  if (remoteCommandPending == REMOTE_COMMAND_BAND)
+    return;
+  remoteCommandPending = REMOTE_COMMAND_BAND;
+  remoteCommandPendingLabel = 0;
+
+  sendScheduledButton();
+}
+
+void attachBandButtonInterrupt(uint8_t pin){
+  attachInterrupt(pin, scheduleBandButton, RISING);
 }
 
 void setup() {
   #ifdef LOW_CPU_SPEED
-    setCpuFrequencyMhz(80); //Set CPU clock to 80MHz fo example
+    setCpuFrequencyMhz(80); //Set CPU clock to 80MHz to save power
   #endif
 
   Wire.begin(SDA_OLED, SCL_OLED);
@@ -246,6 +355,12 @@ void setup() {
     Serial.println("Can't set ITimer0. Select another freq. or timer");
 
   mcp4251Setup();
+
+
+  for (uint8_t i = 0; i < sizeof(buttonPins); i++) {
+    pinMode(buttonPins[i], INPUT);
+  };
+  attachBandButtonInterrupt(PIN_BAND);
 
   attachWaitForHighInterrupt();
 }
@@ -293,7 +408,15 @@ unsigned long waitForLevelAndRecord(boolean level) {
   return currentLevelLength;
 }
 
+void reportUnknownMessage(uint8_t commandByte) {
+  Serial.println("Unknown message: " + String(commandByte, BIN));
+  oled.clear();
+  oled.println("Unknown message:");
+  oled.println(String(commandByte, BIN));
+}
+
 void processRadioMessage(uint8_t commandByte, uint16_t attributeBytes) {
+  Serial.println("Radio Message");
   currentPreset = getBitsFromCommandByte(commandByte, 0, 5);
   radioBand = getBitsFromAttributeBytes(attributeBytes, 0, 2);
   if (radioBand == RADIO_AM) {
@@ -338,6 +461,7 @@ void processRadioMessage(uint8_t commandByte, uint16_t attributeBytes) {
 }
 
 void processTapeMessage(uint8_t commandByte) {
+  Serial.println("Tape Message");
   if (getBitsFromCommandByte(commandByte, 4, 1) == 0b00000001) {
     tapeDirection = PLAYING_REV;
   } else {
@@ -367,14 +491,12 @@ void processTapeMessage(uint8_t commandByte) {
 
 // messages that begin with 011
 void processStateMessage(uint8_t commandByte) {
+  Serial.println("State Message");
   // todo modal message for bass boost
   currentBassBoost = getBitsFromCommandByte(commandByte, 0, 3);
 }
 
-void processPayload() {
-  uint8_t commandByte = getCommandByte(currentCommandBytes);
-  uint16_t attributeBytes = getAttributeBytes(currentCommandBytes);
-
+void printFormattedMessage(uint8_t commandByte, uint16_t attributeBytes) {
   char commandBuffer[9];
   char commandBuffer2[9];
   itoa (commandByte,commandBuffer,2);
@@ -392,6 +514,13 @@ void processPayload() {
   } else {
     Serial.println(commandBuffer2);
   }
+}
+
+void processPayload() {
+  uint8_t commandByte = getCommandByte(currentCommandBytes);
+  uint16_t attributeBytes = getAttributeBytes(currentCommandBytes);
+
+  printFormattedMessage(commandByte, attributeBytes);
 
   /* There's probably a better way to deduce the current mode (radio or tape)
   using the bits in the command byte, but instead we just assume that if there
@@ -402,6 +531,7 @@ void processPayload() {
       functionMode = RADIO_MODE;
       processRadioMessage(commandByte, attributeBytes);
     } else {
+      reportUnknownMessage(commandByte);
       functionMode == UNKNOWN_MODE;
     }
     updateDisplay();
@@ -409,22 +539,38 @@ void processPayload() {
     /* "skippable" messages: don't know that they mean, but we've functioned long enough without them! */
     if (getBitsFromCommandByte(commandByte, 5, 3) == 0b00000011) {
       processStateMessage(commandByte);
-      // // send whenever radio frequency changes (at turn on or button), regardless of tape direction
-      // return;
-    }
-    if (getBitsFromCommandByte(commandByte, 7, 1) == 0b0000000) {
+    } else if (getBitsFromCommandByte(commandByte, 7, 1) == 0b0000000) {
       functionMode = TAPE_MODE;
       processTapeMessage(commandByte);
       updateDisplay();
+    } else {
+      reportUnknownMessage(commandByte);
     }
   }
+}
 
+void indicatePollingModeEnabled() {
+  digitalWrite(LED_BUILTIN, HIGH);
+}
 
+void indicatePollingModeDisabled() {
+  digitalWrite(LED_BUILTIN, LOW);
 }
 
 void loop() {
+  if (displayDirty) {
+    updateDisplay();
+    displayDirty = false;
+    displayRemoteCommandDirty = false;
+  }
+
+  if (displayRemoteCommandDirty) {
+    updateCurrentCommand();
+    displayRemoteCommandDirty = false;
+  }
+
   if (senderIsTransmitting) {
-    digitalWrite(LED_BUILTIN, HIGH);
+    indicatePollingModeEnabled();
     if (inMessage) {
       unsigned long highPeriod = waitForLevelAndRecord(HIGH);
       unsigned long lowPeriod = waitForLevelAndRecord(LOW);
@@ -468,7 +614,7 @@ void loop() {
       }
     }
   } else {
-    digitalWrite(LED_BUILTIN, LOW);
+    indicatePollingModeDisabled();
 
     // keep this delay *before* the sleep. We don't want the MCU to wake from sleep and then immediately delay!
     delayMicroseconds(NO_SENDER_LOOP_DELAY_MICROSECONDS);
@@ -485,7 +631,8 @@ void loop() {
         detachInterrupt(REMOTE_DATA_PIN);
         senderIsTransmitting = true;
         // sleep
-        esp_sleep_enable_ext0_wakeup(SLEEP_WAKEUP_PIN, HIGH);
+        // esp_sleep_enable_ext0_wakeup(SLEEP_WAKEUP_PIN, HIGH);
+        esp_sleep_enable_ext1_wakeup(0b00001000000000000001000000000000, ESP_EXT1_WAKEUP_ANY_HIGH);
         esp_light_sleep_start();
       #endif
     }
