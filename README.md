@@ -34,22 +34,11 @@ Not all devices will have the same capabilities when connected to a
 remote control. Just because the remote control will plug is does not mean it
 will work.
 
-Often, basic transport (play, pause, stop, ffwd, rwd) and volume controls
-will work on any device that support those functions. Beyond those basic
-functions, button behaviour will depend on the remote control and the device
-being controlled. Even basic button compatibility cannot be however; for
-example, the cassette Walkman does not appear to respond to the remote control
-for a CD or MD player.
+Often, basic transport (play, pause, stop, ffwd, rwd) and volume controls will work on any device that support those functions within the same device family. Beyond those basic functions, button behavior will depend on the remote control and the device being controlled. Even basic button compatibility cannot be guaranteed however; for example, the cassette Walkman does not respond to the remote control for a CD or MD player or vice-versa.
 
-While almost all devices will support being controlled by buttons on the remote
-control, not all devices will send data to the remote information display (if so
-equipped). This is especially common on Discman/CD-Walkman and Cassette Walkman
-players. If the device in question was not originally available with an LCD
-remote control, it is likely the device is not designed to send data to one.
+While almost all devices will support being controlled by buttons on the appropriate remote control, not all devices will send data to the remote information display (if so equipped). This is especially common on Discman/CD-Walkman and Cassette Walkman players. If the device in question was not originally available with an LCD remote control, it is likely the device is not designed to send data to one.
 
-There are also *at least* two different versions of the LCD / Information
-Display protocol, and remote controls designed for one will generally not work
-for the other.
+There are also *at least* four different versions of the LCD / Information Display protocol, and remote controls designed for one will generally not work for the other.
 
 ## File and Directories in this repository
 
@@ -67,7 +56,7 @@ for the other.
 * [remote_composer](remote_composer/)
   - Arduino sketch for building remote control LCD messages by hand to sent to the remote control device
 
-## Whis is the name of the connector?
+## What is the name of the connector?
 
 I don't know the technical name for the connector, which is why I've decided
 to call this repo "Sony MD Remote", even though it is used on other devices.
@@ -127,9 +116,7 @@ lower 2.1v of newer MD players.
 
 ## Playback controls
 
-Logically, the buttons work by connecting pin 4 to 2 through a
-[resistor ladder](https://en.wikipedia.org/wiki/Resistor_ladder).
-Different resistances cause different actions on the device.
+Logically, the buttons work by connecting pin 2 to either pin 4 or pin 1 (depending on model) through a [resistor ladder](https://en.wikipedia.org/wiki/Resistor_ladder). Different resistances cause different actions on the device.
 
 On some controls the button resistance can be read without VCC or ground being
 connected or a power source (ex: [RM-MC25C](devices/remotes/Sony+RM-MC25C.md)).
@@ -140,7 +127,7 @@ and ground to be connected before the buttons will work (ex:
 ###  Action resistances
 
 Look in the [remotes](devices/remotes/) directory for a list of the currently tested
-device remote control devices and the resitances of their buttons.
+device remote control devices and the resistances of their buttons.
 
 ## LCD / Information Display Protocol
 
