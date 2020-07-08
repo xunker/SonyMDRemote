@@ -628,12 +628,14 @@ void loop() {
       #endif
 
       #ifdef ENABLE_SLEEP
+        ITimer0.stopTimer();
         detachInterrupt(REMOTE_DATA_PIN);
         senderIsTransmitting = true;
         // sleep
         // esp_sleep_enable_ext0_wakeup(SLEEP_WAKEUP_PIN, HIGH);
         esp_sleep_enable_ext1_wakeup(0b00001000000000000001000000000000, ESP_EXT1_WAKEUP_ANY_HIGH);
         esp_light_sleep_start();
+        ITimer0.restartTimer();
       #endif
     }
 
