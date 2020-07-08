@@ -51,13 +51,14 @@ const uint8_t buttonPins[] = {
 #define PIN_BAND buttonPins[0]
 
 volatile uint8_t remoteCommandPending = 0;
+#define DIGIPOT_DIVISIONS 257
 // number is the digipot divisions to send
-#define REMOTE_COMMAND_BAND 10
-// #define REMOTE_COMMAND_PLAY 2
-// #define REMOTE_COMMAND_STOP 3
-// #define REMOTE_COMMAND_REV 4
-// #define REMOTE_COMMAND_FWD 5
-// #define REMOTE_COMMAND_MEGA_BASS 6
+#define REMOTE_COMMAND_BAND 25 // 4.52k ohms
+// #define REMOTE_COMMAND_PLAY 5 // 0.82k ohms
+// #define REMOTE_COMMAND_STOP 0
+// #define REMOTE_COMMAND_REV 17 // 3.02k ohms
+// #define REMOTE_COMMAND_FWD 10 // 1.8k ohms
+// #define REMOTE_COMMAND_MEGA_BASS 33 // 5.8k-6.8k ohms
 
 #define REMOTE_COMMAND_BAND_LABEL 0 // index to commandLabels
 #define REMOTE_COMMAND_PLAY_LABEL 1
@@ -251,14 +252,8 @@ volatile boolean senderIsTransmitting = false;
 void IRAM_ATTR TimerHandler0(void) {
   // digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
 
-  if (!inMessage) {
-    if ((senderIsTransmitting) && (currentLevelStartedAt == previousLevelStartedAt)) {
-      // indicates we're polling needlessly
-      senderIsTransmitting = false;
-      previousLevelStartedAt = currentLevelStartedAt;
-    }
+  if (!inMessage)
     return;
-  }
 
   if (currentLevelStartedAt == previousLevelStartedAt)
     breakNow = true;
@@ -276,8 +271,8 @@ void attachWaitForHighInterrupt(){
 }
 
 void sendRemoteCommand(uint8_t potPos) {
-  Serial.println("Sending " + String(potPos, DEC));
-  digitalPotWrite(potPos);
+  Serial.println("Sending " + commandLabels[remoteCommandPendingLabel] + " (" + String(potPos, DEC) + ")");
+  digitalPotWrite(DIGIPOT_DIVISIONS-potPos);
   wakeDigitalPot();
   delay(500);
   shutdownDigitalPot();
