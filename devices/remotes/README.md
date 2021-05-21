@@ -4,14 +4,17 @@ Remote Controls
 ## Sony
 
 - RM-CD6
-  * Shipped with D-EJ615, D-EJ715 CD players
+  * Shipped with D-EJ615, D-EJ625, D-EJ715, D-EJ725 CD players
 
 - RM-CD12EL
+  * Shipped with DEJ-915([source](http://www.stereo2go.com/topic/index.php?content_oid=436884321379582041&board_oid=193392314111653432))
 
 - RM-CD15L
-  - Visually similar to RM-WME23/L
+  - Shipped with CD Walkman D-EJ625 or D-EJ725
+  - Visually similar to RM-WME23/L, but likely not electrically or logical compatible
 
 - RM-CD16EL
+  * Shipped with CD Walkman D-EJ625 or D-EJ725
 
 - RM-CD5F
 
@@ -19,7 +22,22 @@ Remote Controls
 
 - [RM-CDF7L](./Sony%20RM-CDF7L.md)
 
+- [RM-DM18L](./Sony%20RM-DM18L.md)
+
+- RM-DM27L
+  - LCD remote
+  - for CD Walkman D-E500?
+
+- RM-DM28EL
+
 - RM-DM29
+  - Non-LCD remote
+  - For CD Walkman D-E400/D-E404?
+
+- RM-DM32EL
+  - LCD remote
+  - Backlight
+  - For CD Walkman D-E707?
 
 - [RM-DM4L](./Sony%20RM-DM4L.md)
 
@@ -42,6 +60,9 @@ Remote Controls
 - [RM-MC25C](./Sony%20RM-MC25C.md)
 
 - RM-MC21
+
+- RM-MC22F
+  * Probably shipped with CD Walkman D-FJ210
 
 - RM-MC26
 
@@ -136,6 +157,8 @@ Remote Controls
 
 - [RM-MZE33](./Sony%20RM-MZE33.md)
 
+- RM-MZE44
+
 - RM-MZE55
   * Shipped with [MZ-E55](https://minidisc.org/part_Sony_MZ-E55.html)
 
@@ -156,20 +179,41 @@ Remote Controls
 - [RM-WMC1](https://www.minidisc.org/part_Sony_RM-WMC1.html)
 
 - RM-WME23
-  - For Cassette Walkman, tape only
-  - Visually similar to RM-CD15L
+  - For Cassette Walkman, WM-EX610
+  - Visually similar to RM-CD15L, but likely not electrically or logical compatible
+  - [Peter Vis page on RM-WME23](https://www.petervis.com/electronics%20guides/Sony%20WM-EX610/RM-WME23.html)
 
 - RM-WMF23L
   - For Cassette/Radio Walkman
-  - Visually similar to RM-CD15L
+  - Visually similar to RM-CD15L, but likely not electrically or logical compatible
 
-- [RM-WME5]
+- RM-WME5
   - Shipped with Cassette Walkman WM-EX506
 
 - [RM-WMF5](./Sony%20RM-WMF5.md)
 
+- RM-WMG21L
+  - LCD remote for WM-GX677
+
+- RM-WMG654
+  - LCD remote for WM-GX654
+
 - Qualia 017 remote
   * supplied with the Qualia 017. This remote is based on the 35ELK, except with sleek lines and encased in polished, shiny steel.[[1]](#source_1)
+
+- MDR-EW34E
+  - Non-LCD remote control with attached earbud headphones
+  - For WM-EX622?
+
+- MDR-EW1W/S
+
+- MDR-EW2X
+  - Non-LCD remote control with attached earbud headphones
+  - For WM-EX622?
+
+- RM-TCS1
+  - Non-LCD remote
+  - For TCS100?
 
 ## Aiwa
 

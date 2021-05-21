@@ -41,7 +41,6 @@ void setup() {
   Serial.println("Ready");
 }
 
-
 void sendZero() {
   // Serial.print("0");
   digitalWriteFast(REMOTE_DATA_PIN, LOW);
@@ -74,21 +73,15 @@ void sendSyncReset() {
   delayMicroseconds(1018);
 }
 
-void sendStartBit() {
-  sendZero();
-}
+void sendStartBit() { sendZero(); }
 
 /* send the byte with the bit order the remote expects */
 void sendByteNatural(byte bin) {
-  for (int8_t i = 7; i >= 0; i--)
-  {
+  for (int8_t i = 7; i >= 0; i--) {
     // for (uint8_t i = 0; i < 8; i++) {
-    if (bitRead(bin, i))
-    {
+    if (bitRead(bin, i)) {
       sendOne();
-    }
-    else
-    {
+    } else {
       sendZero();
     }
   }
@@ -104,8 +97,7 @@ void send105BitHeader() {
 
 void send105BitMessageBody(byte bytes[10]) {
   byte parity = 0b00000000;
-  for (uint8_t i = 0; i < 10; i++)
-  {
+  for (uint8_t i = 0; i < 10; i++) {
     sendByteNatural(bytes[i]);
     parity = parity ^ bytes[i];
   }
@@ -123,17 +115,16 @@ byte flipByte(byte c) {
 }
 
 void sendVolumeMessage(uint8_t volume) {
-  byte bodyBytes[10] = {
-      0b00000010,       // Volume Message 0x40
-      flipByte(volume), // 0b00110000,
-      0b00000010,
-      0b01111001,
-      0b00000000,
-      0b00000000,
-      0b00000000,
-      0b00000000,
-      0b00000000,
-      0b00000000};
+  byte bodyBytes[10] = {0b00000010,        // Volume Message 0x40
+                        flipByte(volume),  // 0b00110000,
+                        0b00000010,
+                        0b01111001,
+                        0b00000000,
+                        0b00000000,
+                        0b00000000,
+                        0b00000000,
+                        0b00000000,
+                        0b00000000};
   send105BitHeader();
   send105BitMessageBody(bodyBytes);
 }
@@ -156,43 +147,41 @@ void sendTrackNumberMessage(uint8_t track) {
 
   uint8_t ones = track;
 
-  byte bodyBytes[10] = {
-      0b00000101, // Track number message  0xA0
-      0b00000000,
-      0b00000000,
-      flipByte(hundreds),           // hundreds
-      flipByte((tens << 4) ^ ones), // tens/ones
-      0b00000000,
-      0b00000000,
-      0b00000000,
-      0b00000000,
-      0b00000000};
+  byte bodyBytes[10] = {0b00000101,  // Track number message  0xA0
+                        0b00000000,
+                        0b00000000,
+                        flipByte(hundreds),            // hundreds
+                        flipByte((tens << 4) ^ ones),  // tens/ones
+                        0b00000000,
+                        0b00000000,
+                        0b00000000,
+                        0b00000000,
+                        0b00000000};
   send105BitHeader();
   send105BitMessageBody(bodyBytes);
 }
 
 const byte batteryLevels[] = {
-    0x80, // LoBATT
-    0x01, // 0/4 (1 bar Blinking)
-    0x9f, // 1/4 Bars
-    0xbf, // 2/4 Bars
-    0xdf, // 3/4 Bars
-    0xff, // 4/4 Bars
-    0x7f // Charge
+    0x80,  // LoBATT
+    0x01,  // 0/4 (1 bar Blinking)
+    0x9f,  // 1/4 Bars
+    0xbf,  // 2/4 Bars
+    0xdf,  // 3/4 Bars
+    0xff,  // 4/4 Bars
+    0x7f   // Charge
 };
 
 void sendBatteryLevelMessage(uint8_t level) {
-  byte bodyBytes[10] = {
-      0b11000010,              // Battery Level Message 0x43
-      flipByte(batteryLevels[level]),
-      0b00000000,
-      0b00000000,
-      0b00000000,
-      0b00000000,
-      0b00000000,
-      0b00000000,
-      0b00000000,
-      0b00000000};
+  byte bodyBytes[10] = {0b11000010,  // Battery Level Message 0x43
+                        flipByte(batteryLevels[level]),
+                        0b00000000,
+                        0b00000000,
+                        0b00000000,
+                        0b00000000,
+                        0b00000000,
+                        0b00000000,
+                        0b00000000,
+                        0b00000000};
   send105BitHeader();
   send105BitMessageBody(bodyBytes);
 }
@@ -207,10 +196,8 @@ void volumeLoop() {
   sendVolumeMessage(vol);
 
   vol += volDir;
-  if (vol >= 30)
-    volDir = -1;
-  if (vol <= 0)
-    volDir = +1;
+  if (vol >= 30) volDir = -1;
+  if (vol <= 0) volDir = +1;
 }
 
 uint8_t trackNumber = 90;
@@ -223,10 +210,8 @@ void trackNumberLoop() {
   sendTrackNumberMessage(trackNumber);
 
   trackNumber += trackNumberDir;
-  if (trackNumber >= 99)
-    trackNumberDir = -1;
-  if (trackNumber <= 0)
-    trackNumberDir = +1;
+  if (trackNumber >= 99) trackNumberDir = -1;
+  if (trackNumber <= 0) trackNumberDir = +1;
 }
 
 byte batteryLevel = 0;
@@ -239,10 +224,8 @@ void batteryLevelLoop() {
   sendBatteryLevelMessage(batteryLevel);
 
   batteryLevel += batteryLevelDir;
-  if (batteryLevel >= sizeof(batteryLevels))
-    batteryLevelDir = -1;
-  if (batteryLevel <= 0)
-    batteryLevelDir = +1;
+  if (batteryLevel >= sizeof(batteryLevels)) batteryLevelDir = -1;
+  if (batteryLevel <= 0) batteryLevelDir = +1;
 }
 
 void loop() {

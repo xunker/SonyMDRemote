@@ -12,7 +12,7 @@ The port is ubiquitous on Sony's MiniDisc players and recorders, hence the name,
 * some Discman and CD-Walkman players, including:
   - D-35, D-66/D-T66, D-99
   - D-155
-  - D-211, D-235, D-265
+  - D-211, [D-235](Sony%20D-235.md), D-265
   - D-303, D-305, D-311, D-335, D-350, D-365
   - D-465, D-475
   - D-515
@@ -30,7 +30,7 @@ The port is ubiquitous on Sony's MiniDisc players and recorders, hence the name,
   - D-EJ100
   - D-EJ615, D-EJ625
   - D-EJ715, D-EJ721, D-EJ725, D-EJ755, D-EJ765, D-EJ775, D-EJ785
-  - [D-EJ815], D-EJ825, D-EJ835, D-EJ855, D-EJ885
+  - [D-EJ815](Sony%20D-EJ815.md), D-EJ825, D-EJ835, D-EJ855, D-EJ885
   - D-EJ915 D-EJ955 D-EJ985
   - D-F400, D-F415
   - D-FJ210, D-FJ215, D-FJ405, D-FJ65, D-FJ737, D-FJ75
@@ -44,17 +44,18 @@ The port is ubiquitous on Sony's MiniDisc players and recorders, hence the name,
   - CRX10U portable USB CD-R/RW drive
   - few Aiwa players:
     - XP-V713, XP-ZV71, XP-ZV77
-* some Walkman cassette players, including:
+* some Walkman cassette players/recorders, including:
   - MW-EX1, MW-EX2, MW-EX3, MW-EX5, MW-EX7, MW-EX20
   - MW-EX511, MW-EX563, MW-EX570
   - MW-EX600, MW-EX610, MW-EX612, MW-EX631, MW-EX633, MW-EX641, MW-EX642, MW-EX651, MW-EX655, MW-EX674, MW-EX677
   - MW-EX811, MW-EX833, MW-EX877, MW-EX900, WM-EX921
   - WM-FX1, MW-FX2, MW-FX3, MW-FX5
   - WM-FX493, MW-FX822, WM-FX833, MW-FX85, [WM-FX855](Sony%20WM-FX855.md)
-  - MW-GX622, MW-GX711, MW-GX822
+  - [MW-GX622](Sony%20WM-GX622.md), MW-GX711, MW-GX822
   - MW-RX822
   - MW-WX777
   - WM-EK1, WM-FK2
+  - TCS100
 * some Network Walkman digital media players, including:
   - NW-A1000, NW-A1200, NW-A3000
   - NW-HD1, NW-HD2, NW-HD3, NW-HD5
